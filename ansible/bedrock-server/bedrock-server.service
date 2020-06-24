@@ -1,0 +1,14 @@
+[Unit]
+Description=Minecraft Bedrock Server
+
+[Service]
+ExecStart=/root/bedrock_server
+Environment=LD_LIBRARY_PATH=.
+WorkingDirectory=/root
+StandardOutput=file:/root/bedrock-server.log
+StandardError=file:/root/bedrock-server.log
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

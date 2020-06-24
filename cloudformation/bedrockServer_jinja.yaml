@@ -1,0 +1,235 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "VPC for Minecraft Bedrock Server"
+
+# Look up AMI IDs here: https://cloud-images.ubuntu.com/locator/ec2/
+Mappings: 
+  RegionMap: 
+    us-east-2:
+      "HVM64": "ami-07c1207a9d40bc3bd"
+      "InstanceType": "t3a.micro"
+    ca-central-1:
+      "HVM64": "ami-0edd51cc29813e254"
+      "InstanceType": "t3a.micro"
+    eu-north-1:
+      "HVM64": "ami-050981837962d44ac"
+      "InstanceType": "t3a.micro"
+
+
+Resources:
+
+  #######
+  # VPC #
+  #######
+  VPC:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+      Tags:
+        - Key:   "Name"
+          Value: "bedrock-server-vpc"
+  
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: "10.0.1.0/24"
+      MapPublicIpOnLaunch: "true"
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnetNetworkAclAssociation:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      NetworkAclId: !GetAtt VPC.DefaultNetworkAcl
+
+
+  ###################
+  # Security Groups #
+  ###################
+  SecurityGroupSSH:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Enable SSH access via port 22, from deployment host"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: "22"
+          ToPort: "22"
+          CidrIp: "{{ config.my_ip }}/32"
+
+  SecurityGroupMinecraftServer:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Enable access to Minecraft Bedrock server for approved IPs"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: "icmp"
+          FromPort: "-1"
+          ToPort: "-1"
+          CidrIp: "0.0.0.0/0"
+      {%- for ip in config.whitelisted_cidrs %} 
+        - IpProtocol: "udp"
+          FromPort: "19132"
+          ToPort: "19132"
+          CidrIp: "{{ ip }}"
+      {%- endfor %}
+
+
+  #######
+  # IAM #
+  #######
+  BedrockRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: "bedrockServerPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:CreateBucket"
+                  - "s3:Head*"
+                  - "s3:List*"
+                  - "s3:GetObject"
+                  - "s3:PutObject"
+                  - "logs:*"
+                  - "sts:*"
+                  - "ec2messages:GetMessages"
+                Resource: "*"
+  
+  BedrockInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: "/"
+      Roles:
+        - !Ref BedrockRole
+
+
+  ###########
+  # Logging #
+  ###########
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      LogGroupName: "/aws/ec2/bedrock-server"
+      RetentionInDays: 7
+  LogStream:
+    Type: AWS::Logs::LogStream
+    Properties:
+      LogGroupName: !Ref LogGroup
+      LogStreamName: "bedrock-server"
+
+
+  #################
+  # EC2 instances #
+  #################
+  BedrockServer:
+    Type: "AWS::EC2::Instance"
+    Properties: 
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", HVM64]
+      InstanceType: !FindInMap [RegionMap, !Ref "AWS::Region", InstanceType]
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 30
+      IamInstanceProfile: !Ref BedrockInstanceProfile
+      KeyName: {{ config.ec2_keypair_name }}
+      SecurityGroupIds:
+        - !Ref SecurityGroupSSH
+        - !Ref SecurityGroupMinecraftServer
+      SubnetId: !Ref PublicSubnet
+      Tags:
+        - Key:   "Name"
+          Value: "bedrock-server"
+
+
+  #######################
+  # EIP and Association #
+  #######################
+  Eip:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: "Name"
+          Value: "bedrock-server-eip"
+  
+  EipAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: !GetAtt Eip.AllocationId
+      InstanceId: !Ref BedrockServer
+
+
+###########
+# Outputs #
+###########
+Outputs:
+  VPCID:
+    Description: "VPC ID"
+    Value: !Ref VPC
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCID"
+  PublicSubnetID:
+    Description: "Public Subnet ID"
+    Value: !Ref PublicSubnet
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicSubnetID"
+  SecurityGroupSSH:
+    Description: "SG ID allowing SSH access"
+    Value: !Ref SecurityGroupSSH
+    Export:
+      Name: !Sub "${AWS::StackName}-SecurityGroupSSH"
+  SecurityGroupMinecraftServer:
+    Description: "SG ID allowing Minecraft server access to approved IPs"
+    Value: !Ref SecurityGroupMinecraftServer
+    Export:
+      Name: !Sub "${AWS::StackName}-SecurityGroupMinecraftServer"
+  Eip:
+    Description: Elastic IP Address
+    Value: !Ref Eip
+    Export:
+      Name: !Sub "${AWS::StackName}-EipAddress"
+  BedrockServerInstanceId:
+    Description: Instance ID of the Bedrock Server
+    Value: !Ref BedrockServer
+    Export:
+      Name: !Sub "${AWS::StackName}-BedrockServerInstanceId"

@@ -1,0 +1,31 @@
+# Main config file
+config.yaml
+
+# Set you own gitignored AWS tags, in case they have secrets
+cloudformation/tags/*.json
+!cloudformation/tags/*-example.json
+
+# Filled securityGroups CFN template
+cloudformation/*.yaml
+
+# No '.env' files
+*.env
+
+# Potentially-sensitive Ansible stuff
+ansible/hosts
+ansible/ansible.cfg
+ansible/phantom-proxy/phantom-proxy.service
+
+# Bedrock server files you might not want to push
+ansible/bedrock-server/server.properties
+ansible/bedrock-server/permissions.json
+ansible/bedrock-server/whitelist.json
+
+# Actual server backups, in case you pull them locally
+*.tar.gz
+
+# Other misc.
+.vscode
+
+# Don't ignore any '_jinja' files. Make sure this stays at the end of the file!
+!*_jinja*
