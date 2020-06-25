@@ -46,9 +46,6 @@
         - {src: './backup-to-s3.sh', dest: '/root/backup-to-s3.sh'}
         - {src: './restore-from-s3.sh', dest: '/root/restore-from-s3.sh'}
 
-    - name: Start CloudWatch Logs Agent
-      command: bash /root/start-logs-agent.sh
-
     - name: Set up backup cron job on host
       cron:
         name: "Backup Minecraft Bedrock server data"
@@ -57,8 +54,16 @@
         day: "*/1"
         job: "bash /root/backup-to-s3.sh >> /root/cron.log 2>&1"
 
+    - name: Start CloudWatch Logs Agent
+      command: bash /root/start-logs-agent.sh
+
     - name: Check if backup data exists in S3, and retrieve it if so
       command: bash /root/restore-from-s3.sh
+
+    - name: Try to remove log file, so it's opened reliably by the Bedrock Server service
+      file:
+        path: /root/bedrock-server.log
+        state: absent
 
     - name: Configure & run Bedrock server as a systemd service
       systemd:
