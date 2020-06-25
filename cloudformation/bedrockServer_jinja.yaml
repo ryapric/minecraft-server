@@ -1,18 +1,16 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "VPC for Minecraft Bedrock Server"
 
+# Ubuntu 18.04 map
 # Look up AMI IDs here: https://cloud-images.ubuntu.com/locator/ec2/
 Mappings: 
   RegionMap: 
     us-east-2:
       "HVM64": "ami-07c1207a9d40bc3bd"
-      "InstanceType": "t3a.micro"
     ca-central-1:
       "HVM64": "ami-0edd51cc29813e254"
-      "InstanceType": "t3a.micro"
     eu-north-1:
       "HVM64": "ami-050981837962d44ac"
-      "InstanceType": "t3a.micro"
 
 
 Resources:
@@ -165,7 +163,7 @@ Resources:
     Type: "AWS::EC2::Instance"
     Properties: 
       ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", HVM64]
-      InstanceType: !FindInMap [RegionMap, !Ref "AWS::Region", InstanceType]
+      InstanceType: {{ config.instance_type }}
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
