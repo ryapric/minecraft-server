@@ -10,9 +10,9 @@ bedrock_server_version: "1.16.0.2"
 bedrock_server_ip: "1.1.1.1"
 
 # EC2 instance types for the server.
-# - t3a.nano (2C/0.5GB) is probably what you want running all the time.
+# - t3a.micro (2C/0.5GB) is probably what you want running all the time.
 # t3a.xlarge is what you want for the cheapest 4 cores, t3a.2xlarge for 8, etc.
-instance_type: "t3a.nano" # t3a.xlarge is what you want for the cheapest 4 cores, t3a.2xlarge for 8, etc.
+instance_type: "t3a.micro" # t3a.xlarge is what you want for the cheapest 4 cores, t3a.2xlarge for 8, etc.
 
 # Needed to whitelist SSH access to the server host
 my_ip: "2.2.2.2"

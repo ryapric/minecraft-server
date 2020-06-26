@@ -54,6 +54,12 @@
         day: "*/1"
         job: "bash /root/backup-to-s3.sh >> /root/cron.log 2>&1"
 
+    - name: Set up log removal cron job on host
+      cron:
+        name: "Remove Bedrock server log file, so systemd logging keeps working"
+        special_time: reboot
+        job: "rm -rf /root/bedrock-server.log"
+
     - name: Start CloudWatch Logs Agent
       command: bash /root/start-logs-agent.sh
 
