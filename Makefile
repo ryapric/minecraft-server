@@ -8,6 +8,8 @@ SHELL := /usr/bin/env bash
 help:
 	@printf "See Makefile for available targets\n"
 
+deploy: cfn-deploy ansible-configure-bedrock-server
+
 # This renders all Jinja templates in the repo with your secure, gitignored values
 render-all:
 	@printf "Rendering all Jinja templates...\n"
@@ -18,6 +20,7 @@ render-all:
 ##################
 cfn-deploy: render-all
 	aws cloudformation deploy \
+		--no-fail-on-empty-changeset \
 		--stack-name bedrockServer \
 		--template-file cloudformation/bedrockServer.yaml \
 		--tags 'Owner=ryapric@gmail.com' \
@@ -37,7 +40,7 @@ cfn-test: render-all
 # Ansible #
 ###########
 ansible-configure-bedrock-server: render-all
-	@cd ansible && ansible-playbook ./bedrock-server/main.yaml
+	cd ansible && ansible-playbook ./bedrock-server/main.yaml
 
 ansible-configure-phantom-proxy: render-all
-	@cd ansible && ansible-playbook ./phantom-proxy/main.yaml
+	cd ansible && ansible-playbook ./phantom-proxy/main.yaml

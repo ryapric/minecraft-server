@@ -11,7 +11,7 @@
 
     - name: Download Phantom
       get_url:
-        url: https://github.com/jhead/phantom/releases/download/v0.3.1/phantom-linux-arm7
+        url: https://github.com/jhead/phantom/releases/download/v{{ phantom_proxy_version }}/phantom-linux-arm7
         dest: /root/phantom
         mode: '0755'
 
