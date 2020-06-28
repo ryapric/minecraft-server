@@ -48,6 +48,7 @@ local_ssh_keyfile: "/local/path/to/private/ssh/key"
 # Host IP of the Phantom proxy on your own home network. If not using, leave
 # blank/default
 phantom_proxy_host_ip: "192.168.0.0"
+phantom_proxy_version: "0.5.1"
 
 
 #####################
