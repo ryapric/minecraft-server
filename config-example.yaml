@@ -1,3 +1,7 @@
+#################################################
+# ! ! ! Rename this to just 'config.yaml' ! ! ! #
+#################################################
+
 # This is the only file that you should back up, really. You may add any
 # Minecraft Bedrock config options at the bottom of this file, exactly as you
 # would find them in the usual `server.properties` file, with three caveats: use
@@ -15,7 +19,9 @@ bedrock_server_ip: "1.1.1.1"
 instance_type: "t3a.micro" # t3a.xlarge is what you want for the cheapest 4 cores, t3a.2xlarge for 8, etc.
 
 # Needed to whitelist SSH access to the server host
-my_ip: "2.2.2.2"
+ssh_access_ips:
+  - "2.2.2.2"
+  - "3.3.3.3"
 
 # Restrict access to Gamertags you recognize
 whitelisted_gamertags:

@@ -74,13 +74,16 @@ Resources:
   SecurityGroupSSH:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
-      GroupDescription: "Enable SSH access via port 22, from deployment host"
+      GroupDescription: "Enable SSH access via port 22, from deployment host and other VM admins"
       VpcId: !Ref VPC
       SecurityGroupIngress:
+      {%- for ip in config.ssh_access_ips %}
         - IpProtocol: "tcp"
           FromPort: "22"
           ToPort: "22"
-          CidrIp: "{{ config.my_ip }}/32"
+          CidrIp: "{{ ip }}/32"
+      {%- endfor %}
+
 
   SecurityGroupMinecraftServer:
     Type: "AWS::EC2::SecurityGroup"
