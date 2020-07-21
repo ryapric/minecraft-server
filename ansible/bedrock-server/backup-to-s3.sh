@@ -10,5 +10,4 @@ bucket="minecraft-bedrock-server-${accountNumber}"
 bakfile="bedrock-server-backup.tar.gz"
 
 tar -czf "${bakfile}" worlds
-aws s3 mb "s3://${bucket}" || printf "Backup bucket %s already exists\n" "${bucket}"
 aws s3 cp "${bakfile}" "s3://${bucket}/${bakfile}"

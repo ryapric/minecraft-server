@@ -15,6 +15,25 @@ Mappings:
 
 Resources:
 
+  #############
+  # S3 Bucket #
+  #############
+  Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub "minecraft-bedrock-server-${AWS::AccountId}"
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Status: Enabled
+            Id: Delete stale world data
+            NoncurrentVersionExpirationInDays: 3
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 1
+
+
   #######
   # VPC #
   #######
@@ -187,6 +206,7 @@ Resources:
   #######################
   Eip:
     Type: AWS::EC2::EIP
+    DeletionPolicy: Retain
     Properties:
       Domain: vpc
       Tags:
