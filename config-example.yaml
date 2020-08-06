@@ -24,7 +24,7 @@ ssh_access_ips:
   - "3.3.3.3"
 
 # Restrict access to Gamertags you recognize
-whitelisted_gamertags:
+allowed_gamertags:
   - "you"
   - "yourFriend"
 
@@ -32,7 +32,7 @@ whitelisted_gamertags:
 # itself. If you don't care, then just leave "0.0.0.0/0". Note that if you don't
 # set whitelisted Gamertag entries, anyone can join your server if they know the
 # IP!
-whitelisted_cidrs:
+allowed_cidrs:
   - "2.2.2.2/32" # your own IP
   - "3.3.3.3/32" # your friend
   - "4.4.4.4/32" # another friend

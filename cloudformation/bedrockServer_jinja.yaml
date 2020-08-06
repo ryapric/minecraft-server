@@ -114,7 +114,7 @@ Resources:
           FromPort: "-1"
           ToPort: "-1"
           CidrIp: "0.0.0.0/0"
-      {%- for ip in config.whitelisted_cidrs %} 
+      {%- for ip in config.allowed_cidrs %} 
         - IpProtocol: "udp"
           FromPort: "19132"
           ToPort: "19132"
