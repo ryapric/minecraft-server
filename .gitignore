@@ -1,12 +1,13 @@
-# Main config file
-config.yaml
+# Main config file(s), but not the example
+config*.yaml
+!config-example.yaml
 
 # Set you own gitignored AWS tags, in case they have secrets
-cloudformation/tags/*.json
-!cloudformation/tags/*-example.json
+aws-cloudformation/tags/*.json
+!aws-cloudformation/tags/*-example.json
 
 # Filled securityGroups CFN template
-cloudformation/*.yaml
+aws-cloudformation/*.yaml
 
 # No '.env' files
 *.env

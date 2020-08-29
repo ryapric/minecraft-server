@@ -44,12 +44,14 @@ operator_xuids:
   - "abc123" # you
   - "xyz789" # friend
 
-# Keypair name in AWS, for connecting to the Bedrock server host
+# Keypair name in AWS and your local version of the key, for connecting to the
+# Bedrock server host
 ec2_keypair_name: "name-of-keypair-in-aws"
-
-# SSH private keyfile paths for Ansible to use
 local_aws_keyfile: "/local/path/to/aws/pemkey.pem"
-local_ssh_keyfile: "/local/path/to/private/ssh/key"
+
+# SSH private keyfile path for Ansible to use for helper software, like the
+# Phantom proxy for PS4/XBox, dnsmasq for Switch, etc.
+local_ssh_keyfile: "~/.ssh/id_rsa"
 
 # Host IP of the Phantom proxy on your own home network. If not using, leave
 # blank/default

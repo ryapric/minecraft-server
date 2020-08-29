@@ -22,7 +22,7 @@ cfn-deploy: render-all
 	aws cloudformation deploy \
 		--no-fail-on-empty-changeset \
 		--stack-name bedrockServer \
-		--template-file cloudformation/bedrockServer.yaml \
+		--template-file aws-cloudformation/bedrockServer.yaml \
 		--tags 'Owner=ryapric@gmail.com' \
 		--capabilities CAPABILITY_IAM
 
