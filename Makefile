@@ -54,11 +54,11 @@ get-latest-bedrock-version:
 
 ansible-configure-bedrock-server: render-all get-latest-bedrock-version
 	@printf "Looking up Bedrock server IP...\n"
-	aws ec2 describe-instances \
-		--filters \
-			'Name=tag:Name,Values=*$(server_name)*' \
-			'Name=instance-state-name,Values=running' \
-		--query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text \
+	aws cloudformation describe-stacks \
+		--stack-name BedrockServer-$(server_name) \
+		--query 'Stacks[*].Outputs[*].[OutputKey, OutputValue]' --output text \
+	| grep Eip \
+	| cut -f2 \
 	> /tmp/$(server_name)-ip
 	@printf "Discovered IP: $$(cat /tmp/$(server_name)-ip); adding to $(CONFIG)\n"
 	sed -E -i 's/bedrock_server_ip: .*/bedrock_server_ip: "'$$(cat /tmp/$(server_name)-ip)'"/g' $(CONFIG)
