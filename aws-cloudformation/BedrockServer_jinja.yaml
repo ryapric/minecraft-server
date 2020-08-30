@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "VPC for Minecraft Bedrock Server"
+Description: "Resources for Minecraft Bedrock Server - {{ config.server_name }}"
 
 # Ubuntu 18.04 map
 # Look up AMI IDs here: https://cloud-images.ubuntu.com/locator/ec2/
@@ -12,7 +12,6 @@ Mappings:
     eu-north-1:
       "HVM64": "ami-050981837962d44ac"
 
-
 Resources:
 
   #############
@@ -20,9 +19,9 @@ Resources:
   #############
   Bucket:
     Type: AWS::S3::Bucket
-    DeletionPolicy: Retain
+    # DeletionPolicy: Retain
     Properties:
-      BucketName: !Sub "minecraft-bedrock-servers-${AWS::AccountId}"
+      BucketName: !Sub "minecraft-bedrock-server-{{ config.server_name | lower | replace(" ", "_")}}-${AWS::AccountId}"
       VersioningConfiguration:
         Status: Enabled
       LifecycleConfiguration:
@@ -43,7 +42,7 @@ Resources:
       CidrBlock: "10.0.0.0/16"
       Tags:
         - Key:   "Name"
-          Value: "bedrock-server-vpc"
+          Value: "bedrock-server-{{ config.server_name }}-vpc"
   
   PublicSubnet:
     Type: AWS::EC2::Subnet
@@ -93,7 +92,7 @@ Resources:
   SecurityGroupSSH:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
-      GroupDescription: "Enable SSH access via port 22, from deployment host and other VM admins"
+      GroupDescription: Enable SSH access via port 22, from deployment host and other VM admins
       VpcId: !Ref VPC
       SecurityGroupIngress:
       {%- for ip in config.ssh_access_ips %}
@@ -107,7 +106,7 @@ Resources:
   SecurityGroupMinecraftServer:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
-      GroupDescription: "Enable access to Minecraft Bedrock server for approved IPs"
+      GroupDescription: Enable access to Minecraft Bedrock server for approved IPs
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: "icmp"
@@ -139,13 +138,12 @@ Resources:
               - "sts:AssumeRole"
       Path: "/"
       Policies:
-        - PolicyName: "bedrockServerPolicy"
+        - PolicyName: "BedrockServerPolicy"
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
               - Effect: "Allow"
                 Action:
-                  - "s3:CreateBucket"
                   - "s3:Head*"
                   - "s3:List*"
                   - "s3:GetObject"
@@ -169,13 +167,13 @@ Resources:
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties: 
-      LogGroupName: "/aws/ec2/bedrock-servers"
+      LogGroupName: "/aws/ec2/bedrock-server-{{ config.server_name }}"
       RetentionInDays: 7
   LogStream:
     Type: AWS::Logs::LogStream
     Properties:
       LogGroupName: !Ref LogGroup
-      LogStreamName: "bedrock-server-{{ config.server_name }}"
+      LogStreamName: "{{ config.server_name }}"
 
 
   #################
@@ -198,7 +196,7 @@ Resources:
       SubnetId: !Ref PublicSubnet
       Tags:
         - Key:   "Name"
-          Value: "bedrock-server"
+          Value: "bedrock-server-{{ config.server_name }}"
 
 
   #######################
@@ -206,18 +204,18 @@ Resources:
   #######################
   Eip:
     Type: AWS::EC2::EIP
-    DeletionPolicy: Retain
     Properties:
       Domain: vpc
+      InstanceId: !Ref BedrockServer
       Tags:
         - Key: "Name"
           Value: "bedrock-server-{{ config.server_name }}-eip"
   
-  EipAssociation:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      AllocationId: !GetAtt Eip.AllocationId
-      InstanceId: !Ref BedrockServer
+  # EipAssociation:
+  #   Type: AWS::EC2::EIPAssociation
+  #   Properties:
+  #     AllocationId: !GetAtt Eip.AllocationId
+  #     InstanceId: !Ref BedrockServer
 
 
 ###########

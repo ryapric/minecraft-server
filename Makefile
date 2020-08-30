@@ -49,8 +49,8 @@ get-latest-bedrock-version:
 	@curl -fsSL https://www.minecraft.net/en-us/download/server/bedrock/ \
 	| grep 'https://minecraft.azureedge.net/bin-linux/bedrock-server-' \
 	| sed -E 's/.*a href=".*bin-linux\/bedrock-server-(.*)\.zip".*/\1/' > /tmp/bedrock-version
-	@printf "Latest version: $(shell cat /tmp/bedrock-version), adding to config.yaml\n"
-	@sed -E -i 's/bedrock_server_version: .*/bedrock_server_version: "'$(shell cat /tmp/bedrock-version)'"/g' config.yaml
+	@printf "Latest version: $$(cat /tmp/bedrock-version), adding to config.yaml\n"
+	@sed -E -i 's/bedrock_server_version: .*/bedrock_server_version: "'$$(cat /tmp/bedrock-version)'"/g' config.yaml
 
 ansible-configure-bedrock-server: render-all get-latest-bedrock-version
 	cd ansible && ansible-playbook ./bedrock-server/main.yaml
