@@ -32,9 +32,9 @@ cfn-deploy: render-all
 		--capabilities CAPABILITY_IAM
 
 cfn-delete:
-	@aws cloudformation delete-stack --stack-name bedrockServer
-	@printf "Stack delete request sent. Waiting for delete completion...\n"
-	@aws cloudformation wait stack-delete-complete --stack-name bedrockServer
+	@aws cloudformation delete-stack --stack-name BedrockServer-$(server_name)
+	@printf "Stack delete request sent for BedrockServer-$(server_name). Waiting for delete completion...\n"
+	@aws cloudformation wait stack-delete-complete --stack-name BedrockServer-$(server_name)
 	@printf "Done.\n"
 
 cfn-test: render-all
@@ -46,13 +46,23 @@ cfn-test: render-all
 ###########
 get-latest-bedrock-version:
 	@printf "Looking up latest Bedrock Server version...\n"
-	@curl -fsSL https://www.minecraft.net/en-us/download/server/bedrock/ \
+	curl -fsSL https://www.minecraft.net/en-us/download/server/bedrock/ \
 	| grep 'https://minecraft.azureedge.net/bin-linux/bedrock-server-' \
 	| sed -E 's/.*a href=".*bin-linux\/bedrock-server-(.*)\.zip".*/\1/' > /tmp/bedrock-version
-	@printf "Latest version: $$(cat /tmp/bedrock-version), adding to config.yaml\n"
-	@sed -E -i 's/bedrock_server_version: .*/bedrock_server_version: "'$$(cat /tmp/bedrock-version)'"/g' config.yaml
+	@printf "Latest version: $$(cat /tmp/bedrock-version), adding to $(CONFIG)\n"
+	sed -E -i 's/bedrock_server_version: .*/bedrock_server_version: "'$$(cat /tmp/bedrock-version)'"/g' $(CONFIG)
 
 ansible-configure-bedrock-server: render-all get-latest-bedrock-version
+	@printf "Looking up Bedrock server IP...\n"
+	aws ec2 describe-instances \
+		--filters \
+			'Name=tag:Name,Values=*$(server_name)*' \
+			'Name=instance-state-name,Values=running' \
+		--query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text \
+	> /tmp/$(server_name)-ip
+	@printf "Discovered IP: $$(cat /tmp/$(server_name)-ip); adding to $(CONFIG)\n"
+	sed -E -i 's/bedrock_server_ip: .*/bedrock_server_ip: "'$$(cat /tmp/$(server_name)-ip)'"/g' $(CONFIG)
+	@printf "Deploying Bedrock Server...\n"
 	cd ansible && ansible-playbook ./bedrock-server/main.yaml
 
 ansible-configure-phantom-proxy: render-all
