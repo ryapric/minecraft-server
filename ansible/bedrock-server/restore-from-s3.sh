@@ -3,9 +3,9 @@ set -x
 
 cd /root || exit 1
 
-accountNumber=$(aws sts get-caller-identity --query Account --output text)
-bucket="minecraft-bedrock-server-${accountNumber}"
 server_name=$(grep 'server-name' server.properties | cut -d'=' -f2)
+accountNumber=$(aws sts get-caller-identity --query Account --output text)
+bucket="minecraft-bedrock-server-${server_name,,}-${accountNumber}"
 bakfile="backup-${server_name}.tar.gz"
 logfile="bedrock-server.log"
 
