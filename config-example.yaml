@@ -74,4 +74,4 @@ server_portv6: 19133
 view_distance: 32
 tick_distance: 4
 player_idle_timeout: 30
-max_threads: 8
+max_threads: 0
