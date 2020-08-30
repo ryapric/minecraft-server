@@ -6,12 +6,17 @@ all files in this repo.
 """
 
 from jinja2 import Template
+import os
 import re
 import sys
 import yaml
 
+# Allow users to pass in custom config files via the 'CONFIG' env var (handled
+# by the Makefile)
+config_file = os.environ.get('CONFIG', 'config.yaml')
+
 # Load user config
-with open('./config.yaml') as f:
+with open(config_file) as f:
     config = yaml.safe_load(f.read())
 
 # Define any helper functions you might want to pass to templates to use

@@ -1,0 +1,16 @@
+{
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/root/bedrock-server.log",
+            "log_group_name": "/aws/ec2/bedrock-servers",
+            "log_stream_name": "bedrock-server-{{ config.server_name }}"
+          }
+        ]
+      }
+    },
+    "log_stream_name": "default"
+  }
+}

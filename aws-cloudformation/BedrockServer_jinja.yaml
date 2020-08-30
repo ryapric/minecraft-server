@@ -22,7 +22,7 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     Properties:
-      BucketName: !Sub "minecraft-bedrock-server-${AWS::AccountId}"
+      BucketName: !Sub "minecraft-bedrock-servers-${AWS::AccountId}"
       VersioningConfiguration:
         Status: Enabled
       LifecycleConfiguration:
@@ -169,13 +169,13 @@ Resources:
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties: 
-      LogGroupName: "/aws/ec2/bedrock-server"
+      LogGroupName: "/aws/ec2/bedrock-servers"
       RetentionInDays: 7
   LogStream:
     Type: AWS::Logs::LogStream
     Properties:
       LogGroupName: !Ref LogGroup
-      LogStreamName: "bedrock-server"
+      LogStreamName: "bedrock-server-{{ config.server_name }}"
 
 
   #################
@@ -211,7 +211,7 @@ Resources:
       Domain: vpc
       Tags:
         - Key: "Name"
-          Value: "bedrock-server-eip"
+          Value: "bedrock-server-{{ config.server_name }}-eip"
   
   EipAssociation:
     Type: AWS::EC2::EIPAssociation

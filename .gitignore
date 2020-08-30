@@ -21,6 +21,7 @@ ansible/phantom-proxy/phantom-proxy.service
 ansible/bedrock-server/server.properties
 ansible/bedrock-server/permissions.json
 ansible/bedrock-server/whitelist.json
+ansible/bedrock-server/cw-agent-cfg.json
 
 # Actual server backups, in case you pull them locally
 *.tar.gz

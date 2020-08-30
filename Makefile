@@ -3,6 +3,11 @@ SHELL := /usr/bin/env bash
 
 # accountNumber := $$(aws sts get-caller-identity --query Account --output text)
 # bucket := minecraft-bedrock-server-$(accountNumber)
+ifndef $$CONFIG
+	CONFIG := ./config.yaml
+endif
+
+server_name := $(shell grep 'server_name' $(CONFIG) | cut -d':' -f2 | tr -d ' ')
 
 
 help:
@@ -21,8 +26,8 @@ render-all:
 cfn-deploy: render-all
 	aws cloudformation deploy \
 		--no-fail-on-empty-changeset \
-		--stack-name bedrockServer \
-		--template-file aws-cloudformation/bedrockServer.yaml \
+		--stack-name BedrockServer-$(server_name) \
+		--template-file aws-cloudformation/BedrockServer.yaml \
 		--tags 'Owner=ryapric@gmail.com' \
 		--capabilities CAPABILITY_IAM
 
