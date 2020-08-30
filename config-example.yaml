@@ -57,6 +57,7 @@ local_ssh_keyfile: "~/.ssh/id_rsa"
 # blank/default
 phantom_proxy_host_ip: "192.168.0.0"
 phantom_proxy_version: "0.5.1"
+phantom_proxy_arch: "linux-arm7"
 
 
 #####################
