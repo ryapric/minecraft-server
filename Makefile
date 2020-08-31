@@ -46,6 +46,7 @@ cfn-test: render-all
 ###########
 get-latest-bedrock-version:
 	@printf "Looking up latest Bedrock Server version...\n"
+	set -o pipefail; \
 	curl -fsSL https://www.minecraft.net/en-us/download/server/bedrock/ \
 	| grep 'https://minecraft.azureedge.net/bin-linux/bedrock-server-' \
 	| sed -E 's/.*a href=".*bin-linux\/bedrock-server-(.*)\.zip".*/\1/' > /tmp/bedrock-version
@@ -54,6 +55,7 @@ get-latest-bedrock-version:
 
 ansible-configure-bedrock-server: render-all get-latest-bedrock-version
 	@printf "Looking up Bedrock server IP...\n"
+	set -o pipefail; \
 	aws cloudformation describe-stacks \
 		--stack-name BedrockServer-$(server_name) \
 		--query 'Stacks[*].Outputs[*].[OutputKey, OutputValue]' --output text \
