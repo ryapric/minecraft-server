@@ -56,6 +56,7 @@ local_ssh_keyfile: "~/.ssh/id_rsa"
 # Host IP of the Phantom proxy on your own home network. If not using, leave
 # blank/default
 phantom_proxy_host_ip: "192.168.0.0"
+phantom_proxy_ssh_user: "pi"
 phantom_proxy_version: "0.5.1"
 phantom_proxy_arch: "linux-arm7"
 
@@ -63,7 +64,7 @@ phantom_proxy_arch: "linux-arm7"
 #####################
 # SERVER.PROPERTIES #
 #####################
-server_name: Dedicated server
+server_name: BedrockServer
 level_name: Bedrock level
 gamemode: survival
 difficulty: easy
