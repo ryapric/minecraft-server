@@ -1,10 +1,15 @@
 [Unit]
 Description=Minecraft Bedrock Server
+After=getty.service
 
 [Service]
 ExecStart=/root/bedrock_server
 Environment=LD_LIBRARY_PATH=.
 WorkingDirectory=/root
+StandardInput=tty-force
+TTYVHangup=yes
+TTYPath=/dev/tty20
+TTYReset=yes
 StandardOutput=file:/root/bedrock-server.log
 StandardError=file:/root/bedrock-server.log
 Restart=always

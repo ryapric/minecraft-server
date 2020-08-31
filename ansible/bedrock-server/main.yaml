@@ -23,6 +23,7 @@
           - zip
           - unzip
           - awscli
+          - conspy
         state: latest
 
     - name: Download Bedrock Server
