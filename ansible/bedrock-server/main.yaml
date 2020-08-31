@@ -37,15 +37,24 @@
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
       with_items:
-        - {src: './cw-agent-cfg.json', dest: '/root/cw-agent-cfg.json'}
-        # - {src: './bedrock-server-logs.service', dest: '/etc/systemd/system/bedrock-server-logs.service'}
-        - {src: './start-logs-agent.sh', dest: '/root/start-logs-agent.sh'}
-        - {src: './bedrock-server.service', dest: '/etc/systemd/system/bedrock-server.service'}
-        - {src: './server.properties', dest: '/root/server.properties'}
-        - {src: './permissions.json', dest: '/root/permissions.json'}
-        - {src: './whitelist.json', dest: '/root/whitelist.json'}
-        - {src: './backup-to-s3.sh', dest: '/root/backup-to-s3.sh'}
-        - {src: './restore-from-s3.sh', dest: '/root/restore-from-s3.sh'}
+        - src: './cw-agent-cfg.json'
+          dest: '/root/cw-agent-cfg.json'
+        # - src: './bedrock-server-logs.service'
+        #   dest: '/etc/systemd/system/bedrock-server-logs.service'
+        - src: './start-logs-agent.sh'
+          dest: '/root/start-logs-agent.sh'
+        - src: './bedrock-server.service'
+          dest: '/etc/systemd/system/bedrock-server.service'
+        - src: './server.properties'
+          dest: '/root/server.properties'
+        - src: './permissions.json'
+          dest: '/root/permissions.json'
+        - src: './whitelist.json'
+          dest: '/root/whitelist.json'
+        - src: './backup-to-s3.sh'
+          dest: '/root/backup-to-s3.sh'
+        - src: './restore-from-s3.sh'
+          dest: '/root/restore-from-s3.sh'
 
     - name: Set up backup cron job on host
       cron:
