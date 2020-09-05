@@ -1,5 +1,3 @@
-# NOTE: this is assumed to be running on a Raspberry Pi, so change accordingly
-# if you're doing something different
 - hosts: phantom_proxy
   become: yes
   tasks:
@@ -8,6 +6,7 @@
       copy:
         src: "./phantom-proxy.service"
         dest: "/etc/systemd/system/phantom-proxy.service"
+        mode: "0600"
 
     - name: Download Phantom
       get_url:
