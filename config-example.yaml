@@ -18,7 +18,8 @@ bedrock_server_ip: "1.1.1.1"
 # - t3a.xlarge is what you want for the cheapest 4 cores, t3a.2xlarge for 8, etc.
 instance_type: "t3a.micro"
 
-# Needed to whitelist SSH access to the server host
+# Needed to whitelist SSH access to the server host. You will at least want to
+# put your own IP, for Ansible to work.
 ssh_access_ips:
   - "2.2.2.2"
   - "3.3.3.3"
@@ -38,8 +39,8 @@ allowed_cidrs:
   - "4.4.4.4/32" # another friend
   - "0.0.0.0/0" # anyone at all
 
-# Set Operators for your server. The only reliable way to find these, is to
-# watch the server logs when people log in
+# Set Operators for your server. The only reliable way to find these XUIDs is to
+# watch the server logs when people log in.
 operator_xuids:
   - "abc123" # you
   - "xyz789" # friend
@@ -53,11 +54,11 @@ local_aws_keyfile: "/local/path/to/aws/pemkey.pem"
 # Phantom proxy for PS4/XBox, dnsmasq for Switch, etc.
 local_ssh_keyfile: "~/.ssh/id_rsa"
 
-# Host IP of the Phantom proxy on your own home network. If not using, leave
+# Host info of the Phantom proxy on your own home network. If not using, leave
 # blank/default
 phantom_proxy_host_ip: "192.168.0.0"
 phantom_proxy_ssh_user: "pi"
-phantom_proxy_version: "0.5.1"
+phantom_proxy_version: "0.5.2"
 phantom_proxy_arch: "linux-arm7"
 
 
