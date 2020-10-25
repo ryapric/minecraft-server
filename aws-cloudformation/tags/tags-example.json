@@ -2,5 +2,9 @@
   {
     "Key": "some-key",
     "Value": "some-value"
+  },
+  {
+    "Key": "some-other-key",
+    "Value": "some-other-value"
   }
 ]
