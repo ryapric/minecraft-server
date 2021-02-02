@@ -6,7 +6,7 @@
       copy:
         src: "./phantom-proxy.service"
         dest: "/etc/systemd/system/phantom-proxy.service"
-        mode: "0600"
+        mode: "0644"
 
     - name: Download Phantom
       get_url:

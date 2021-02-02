@@ -1,4 +1,4 @@
-SHELL := /usr/bin/env bash
+SHELL := /usr/bin/env bash -euo pipefail
 
 
 # accountNumber := $$(aws sts get-caller-identity --query Account --output text)
