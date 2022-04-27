@@ -35,18 +35,24 @@ resource "aws_spot_instance_request" "main" {
 
   # Now provision the instance with local Minecraft files & the init script
   # Yeah yeah, I know I know, don't use Terraform provisioners, blah blah blah
+  connection {
+    private_key = "~/.ssh/id_rsa"
+  }
+
   provisioner "file" {
     source = "../../bedrock-server-cfg" # a directory
     destination = "/tmp"
   }
 
   provisioner "file" {
-    source = "../../scripts/init.sh"
-    destination = "/tmp/init.sh"
+    source = "../../scripts" # a directory
+    destination = "/tmp"
   }
 
   provisioner "remote-exec" {
-    
+    inline = [
+      "bash /tmp/scripts/init.sh"
+    ]
   }
 }
 
