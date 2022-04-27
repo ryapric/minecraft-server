@@ -1,8 +1,0 @@
-[
-  {%- for allowed_gamertag in config.allowed_gamertags %}
-  {
-    "ignoresPlayerLimit": "false",
-    "name": "{{ allowed_gamertag }}"
-  }{{ "," if not loop.last }}
-  {%- endfor %}
-]
