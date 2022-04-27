@@ -4,11 +4,11 @@ resource "aws_spot_instance_request" "main" {
   spot_type                      = "persistent"
   wait_for_fulfillment           = true
 
-  ami                    = data.aws_ami.latest.id
-  iam_instance_profile   = aws_iam_instance_profile.main.name
-  instance_type          = var.instance_type
-  key_name               = aws_key_pair.main.key_name
-  subnet_id              = aws_subnet.public.id
+  ami                  = data.aws_ami.latest.id
+  iam_instance_profile = aws_iam_instance_profile.main.name
+  instance_type        = var.instance_type
+  key_name             = aws_key_pair.main.key_name
+  subnet_id            = aws_subnet.public.id
   # user_data              = file("../../scripts/init.sh")
   vpc_security_group_ids = [aws_security_group.main.id]
 
@@ -36,29 +36,31 @@ resource "aws_spot_instance_request" "main" {
   # Now provision the instance with local Minecraft files & the init script
   # Yeah yeah, I know I know, don't use Terraform provisioners, blah blah blah
   connection {
-    private_key = "~/.ssh/id_rsa"
+    host        = self.public_ip # instead of EIP, since that won't be assigned until after all provisioners run
+    private_key = file(pathexpand("~/.ssh/id_rsa"))
+    user = "admin"
   }
 
   provisioner "file" {
-    source = "../../bedrock-server-cfg" # a directory
+    source      = "../../bedrock-server-cfg" # a directory
     destination = "/tmp"
   }
 
   provisioner "file" {
-    source = "../../scripts" # a directory
+    source      = "../../scripts" # a directory
     destination = "/tmp"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "bash /tmp/scripts/init.sh"
+      "sudo bash /tmp/scripts/init.sh"
     ]
   }
 }
 
 resource "aws_key_pair" "main" {
   key_name   = local.name_tag
-  public_key = file("~/.ssh/id_rsa.pub")
+  public_key = file(pathexpand("~/.ssh/id_rsa.pub"))
 }
 
 resource "aws_eip" "main" {

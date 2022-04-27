@@ -8,29 +8,29 @@ fi
 
 cd "${workdir}" || exit 1
 
-server_name=$(grep 'server-name' "${workdir}"/server.properties | cut -d'=' -f2)
-server_name="${server_name,,}"
+world_name=$(grep 'level-name' "${workdir}"/server.properties | sed -E 's/\s+/_/g' | cut -d'=' -f2) # the sed replaces any whitespace in the server name
+world_name="${world_name,,}"
 account_number=$(aws sts get-caller-identity --query Account --output text)
 bucket="minecraft-bedrock-server-backups-${account_number}"
-bakfile="${workdir}/${server_name}.tar.gz"
-key="${server_name}/${bakfile}"
+bakfile="${world_name}.tar.gz"
+key="${world_name}/${bakfile}"
 
 if [[ "$1" == 'backup' ]]; then
 
-  tar -czf "${workdir}/${bakfile}" worlds
+  tar -C "${workdir}" -czf "${workdir}/${bakfile}" worlds/ server.properties allowlist.json permissions.json
   aws s3 cp "${workdir}/${bakfile}" "s3://${bucket}/${key}"
 
 elif [[ "$1" == 'restore' ]]; then
 
   if [[ -f "${workdir}/${bakfile}" ]]; then
-    printf 'Found existing world data on host; skipping download\n'
+    printf 'Found existing World data on host; skipping download\n'
     exit 0
   fi
 
   if aws s3 cp "s3://${bucket}/${key}" "${workdir}/${bakfile}"; then
     printf 'Using discovered World data; size %s\n' "$(du -hs "${workdir}/${bakfile}" | cut -f1)"
     rm -rf "${workdir}"/worlds
-    tar -C "${workdir}" -vxzf "${workdir}/${bakfile}"
+    tar -C "${workdir}" -xzf "${workdir}/${bakfile}"
   else
     printf 'No remote backup data exists or is inaccessible; starting with new World\n'
   fi

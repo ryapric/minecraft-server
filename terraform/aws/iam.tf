@@ -1,5 +1,4 @@
 resource "aws_iam_instance_profile" "main" {
-  name = "${local.name_tag}-${var.world_name}"
   role = aws_iam_role.main.name
 }
 
@@ -33,7 +32,7 @@ resource "aws_iam_policy" "main" {
         ]
         Resource = [
           "arn:aws:s3:::minecraft-bedrock-server-backups-${data.aws_caller_identity.current.id}",
-          "arn:aws:s3:::minecraft-bedrock-server-backups-${data.aws_caller_identity.current.id}/${var.world_name}/*",
+          "arn:aws:s3:::minecraft-bedrock-server-backups-${data.aws_caller_identity.current.id}/*",
         ]
       }
     ]

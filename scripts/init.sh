@@ -11,7 +11,7 @@ done
 ###
 
 printf 'Moving this script to a permanent location if you need it later...\n'
-cp "${BASH_SOURCE[0]}" /usr/local/bin/minecraft-init
+cp "${BASH_SOURCE[0]}" /usr/local/bin/minecraft-init || true
 chmod +x /usr/local/bin/minecraft-init
 
 ###
@@ -37,16 +37,6 @@ curl -fsSL -o /tmp/minecraft-"${version}".zip "${download_url}" || exit 1
 export workdir=/home/admin/minecraft-"${version}"
 mkdir -p "${workdir}"
 unzip -d "${workdir}"/ /tmp/minecraft-"${version}".zip || exit 1
-
-###
-
-printf 'Replacing settings files with your own...\n'
-cp /tmp/bedrock-server-cfg/* "${workdir}"/
-
-###
-
-printf 'Setting permissions on server directory...\n'
-chown -R admin:admin "${workdir}"
 
 ###
 
@@ -83,6 +73,9 @@ Persistent=true
 WantedBy=timers.target
 EOF
 
+# Idempotent creation of worlds folder, so first backup doesn't show a failure in the logs
+mkdir -p "${workdir}"/worlds
+
 systemctl start minecraft-bedrock-server-backup.timer
 systemctl enable minecraft-bedrock-server-backup.timer
 
@@ -90,6 +83,16 @@ systemctl enable minecraft-bedrock-server-backup.timer
 
 printf 'Checking if remote world data exists and needs to be restored...\n'
 /usr/local/bin/minecraft-backups-s3 restore
+
+###
+
+printf 'Replacing settings files with your own...\n'
+cp /tmp/bedrock-server-cfg/* "${workdir}"/
+
+###
+
+printf 'Setting permissions on server directory...\n'
+chown -R admin:admin "${workdir}"
 
 ###
 
