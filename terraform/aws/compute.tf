@@ -38,7 +38,7 @@ resource "aws_spot_instance_request" "main" {
   connection {
     host        = self.public_ip # instead of EIP, since that won't be assigned until after all provisioners run
     private_key = file(pathexpand("~/.ssh/id_rsa"))
-    user = "admin"
+    user        = "admin"
   }
 
   provisioner "file" {
@@ -53,7 +53,7 @@ resource "aws_spot_instance_request" "main" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo bash /tmp/scripts/init.sh"
+      "sudo bash /tmp/scripts/init.sh aws"
     ]
   }
 }
