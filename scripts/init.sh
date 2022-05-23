@@ -167,10 +167,10 @@ systemctl enable minecraft-bedrock-server.service
 
 sleep 3
 systemctl is-active minecraft-bedrock-server.service || {
-  journalctl -n10 -u minecraft-bedrock-server.service
+  journalctl --no-pager -n10 -u minecraft-bedrock-server.service
   exit 1
 }
 
 ###
 
-printf 'All done! Minecraft should be running!\n'
+printf 'All done! Your Minecraft World "%s" should be running!\n' "$(grep 'level-name' "${workdir}"/server.properties | awk -F= '{ print $2 }')"
