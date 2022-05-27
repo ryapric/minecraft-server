@@ -3,7 +3,7 @@ set -euo pipefail
 
 ###
 
-export platform="${1}"
+export platform="${1:-}"
 
 # Tried to get this to work in a case-block, but expression needs to be evaluated first, so
 if id -u admin > /dev/null 2>&1 ; then
@@ -31,19 +31,20 @@ done
 
 ###
 
-printf 'Moving this script to a permanent location if you need it later...\n'
+printf 'Moving this script to a permanent location (%s) if you need it later...\n' /usr/local/bin/minecraft-init
 cp "${BASH_SOURCE[0]}" /usr/local/bin/minecraft-init || true
 chmod +x /usr/local/bin/minecraft-init
 
 ###
 
 printf 'Setting up some system utilities...\n'
-apt-get update -qq && apt-get install -qqq -y \
+apt-get update > /dev/null 2>&1
+apt-get install  \
   curl \
   htop \
   unzip \
-  zip
-printf '\n'
+  zip \
+> /dev/null 2>&1
 
 ###
 
@@ -66,7 +67,7 @@ if [[ -z "${version:-}" ]]; then
   )
   printf 'Found latest Minecraft Bedrock version to be %s\n' "${version}"
 else
-  printf 'Minecraft Bedrock version provided as %s; will try to use that\n' "${version}"
+  printf 'Minecraft Bedrock version provided as %s; will try to use that.\n' "${version}"
   # tail -n1 still here in case your provided version is too short and returns
   # multiple results
   version=$(

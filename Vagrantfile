@@ -20,6 +20,7 @@ Vagrant.configure("2") do |config|
 
     mc.vm.provision "shell",
       inline: <<-SCRIPT
+        export version=''
         bash /tmp/scripts/init.sh vagrant
       SCRIPT
   end
