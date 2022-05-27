@@ -53,7 +53,7 @@ resource "aws_spot_instance_request" "main" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo bash /tmp/scripts/init.sh aws"
+      "export version=${var.minecraft_version} && sudo -E bash /tmp/scripts/init.sh aws"
     ]
   }
 }

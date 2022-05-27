@@ -47,16 +47,41 @@ printf '\n'
 
 ###
 
+printf 'Getting available server versions...\n'
+
+
 {
-  curl -fsSL 'https://minecraft.fandom.com/wiki/Bedrock_Dedicated_Server' > /tmp/wiki.html
+  curl -fsSL \
+    'https://minecraft.fandom.com/wiki/Bedrock_Dedicated_Server' \
+    | grep -E 'azure.*linux.*\.zip.*' \
+  > /tmp/mc-versioned-urls.html
 } || exit 1
-download_url=$(grep -Eo "https://minecraft.azureedge.net/bin-linux/bedrock-server-.*.zip" /tmp/wiki.html | tail -n1)
-version=$(sed -E 's;^.*-([0-9]\..*)\.zip$;\1;' <<< "${download_url}")
+sed -i -E 's/.*(https:.*\.zip).*/\1/' /tmp/mc-versioned-urls.html
+
+# Let user provide a version, but default to latest available
+if [[ -z "${version:-}" ]]; then
+  version=$(
+    tail -n1 /tmp/mc-versioned-urls.html \
+    | sed -E 's;^.*-([0-9]\..*)\.zip$;\1;'
+  )
+  printf 'Found latest Minecraft Bedrock version to be %s\n' "${version}"
+else
+  printf 'Minecraft Bedrock version provided as %s; will try to use that\n' "${version}"
+  # tail -n1 still here in case your provided version is too short and returns
+  # multiple results
+  version=$(
+    grep "${version}" /tmp/mc-versioned-urls.html \
+    | tail -n1  \
+    | sed -E 's;^.*-([0-9]\..*)\.zip$;\1;'
+  )
+fi
 export version
+download_url=$(grep "${version}" /tmp/mc-versioned-urls.html)
+
+printf 'Will use server version %s, and download from %s\n' "${version}" "${download_url}"
+
 version_short=$(sed -E 's/^([0-9]+\.[0-9]+)\..*$/\1/' <<< "${version}")
 export version_short
-
-printf 'Found latest Minecraft Bedrock version to be %s\n' "${version}"
 workdir=$(sudo -u "${mcuser}" sh -c 'echo ${HOME}')/minecraft-"${version_short}"
 printf 'Setting server working directory as %s\n' "${workdir}"
 export workdir
@@ -126,8 +151,7 @@ systemctl enable minecraft-bedrock-server-backup.timer
 printf 'Checking if remote world data exists and needs to be restored...\n'
 /usr/local/bin/minecraft-backups-s3 restore
 
-###
-
+# END platform fork
 fi
 
 ###
