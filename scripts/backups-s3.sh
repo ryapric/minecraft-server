@@ -9,7 +9,7 @@ fi
 # If there's no server.properties in the workdir yet (or if it's using the
 # default leve/world name), check /tmp/bedrock-server-cfg. If neither, exit
 # gracefully
-if [[ -f "${workdir}"/server.properties ]] && ! grep 'level-name=Bedrock level' "${workdir}"/server.properties ; then
+if [[ -f "${workdir}"/server.properties ]] && ! grep -q 'level-name=Bedrock level' "${workdir}"/server.properties ; then
   server_properties="${workdir}"/server.properties
 elif [[ -f /tmp/bedrock-server-cfg/server.properties ]]; then
   server_properties=/tmp/bedrock-server-cfg/server.properties

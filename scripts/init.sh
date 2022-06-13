@@ -38,18 +38,16 @@ chmod +x /usr/local/bin/minecraft-init
 ###
 
 printf 'Setting up some system utilities...\n'
-apt-get update > /dev/null 2>&1
-apt-get install  \
+apt-get update
+apt-get install -y \
   curl \
   htop \
   unzip \
-  zip \
-> /dev/null 2>&1
+  zip
 
 ###
 
 printf 'Getting available server versions...\n'
-
 
 {
   curl -fsSL \
@@ -112,10 +110,14 @@ printf 'Setting up world data backup service...\n'
 cp /tmp/scripts/backups-s3.sh /usr/local/bin/minecraft-backups-s3
 chmod +x /usr/local/bin/minecraft-backups-s3
 
+# TODO: backup happens on shutdown as expected, but NOT when an EC2 instance is
+# terminated during e.g. recreation Need to debug.
 cat <<EOF > /etc/systemd/system/minecraft-bedrock-server-backup.service
 [Unit]
 Description=Minecraft Bedrock Server world data backup service
 Wants=minecraft-bedrock-server-backup.timer
+After=network.target
+Before=poweroff.target shutdown.target reboot.target halt.target
 
 [Service]
 ExecStart=/usr/local/bin/minecraft-backups-s3 backup
@@ -124,7 +126,7 @@ Type=oneshot
 Environment=workdir=${workdir}
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=multi-user.target poweroff.target shutdown.target reboot.target halt.target
 EOF
 
 cat <<EOF > /etc/systemd/system/minecraft-bedrock-server-backup.timer
@@ -144,6 +146,7 @@ EOF
 # Idempotent creation of worlds folder, so first backup doesn't show a failure in the logs
 mkdir -p "${workdir}"/worlds
 
+systemctl enable minecraft-bedrock-server-backup.service # enabled for shutdown-time backup to work
 systemctl start minecraft-bedrock-server-backup.timer
 systemctl enable minecraft-bedrock-server-backup.timer
 
