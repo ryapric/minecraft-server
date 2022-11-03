@@ -3,7 +3,26 @@ set -euo pipefail
 
 ###
 
-export platform="${1:-}"
+export edition="${1:-}"
+export version="${2:-}"
+export platform="${3:-}"
+
+if [[ -z "${edition}" ]]; then
+  printf 'ERROR: Minecraft edition (bedrock|java) not set as first arg to init script, aborting\n' > /dev/stderr
+  exit 1
+elif [[ ! "${edition}" =~ bedrock|java ]]; then
+  printf 'ERROR: Invalid Minecraft edition, must be one of "bedrock" or "java", aborting\n' > /dev/stderr
+  exit 1
+fi
+if [[ -z "${version}" ]]; then
+  printf 'ERROR: version string not set as second arg to init script, aborting\n' > /dev/stderr
+  exit 1
+fi
+if [[ -z "${platform}" ]]; then
+  printf 'WARNING: platform not set as third arg to init script, so some features (like backups) will not be enabled\n' > /dev/stderr
+else
+  printf "Platform '%s' provided to init script; will try to set up associated features if applicable\n" "${platform}"
+fi
 
 # Tried to get this to work in a case-block, but expression needs to be evaluated first, so
 if id -u admin > /dev/null 2>&1 ; then
@@ -16,16 +35,8 @@ fi
 
 ###
 
-if [[ -z "${platform}" ]]; then
-  printf 'WARNING: platform not set as arg to init script, so some features (like backups) will not be enabled\n' > /dev/stderr
-else
-  printf "Platform '%s' provided to init script; will try to set up associated features\n" "${platform}"
-fi
-
-###
-
-until [[ -d /tmp/bedrock-server-cfg ]]; do
-  printf 'Waiting for Minecraft Bedrock config files to land on the host...\n'
+until [[ -d /tmp/server-cfg/"${edition}" ]]; do
+  printf 'Waiting for Minecraft %s config files to land on the host...\n' "${edition^}"
   sleep 5
 done
 
@@ -42,56 +53,48 @@ apt-get update
 apt-get install -y \
   curl \
   htop \
+  openjdk-17-jre-headless \
   unzip \
   zip
 
 ###
 
-printf 'Getting available server versions...\n'
-
-{
-  curl -fsSL \
-    'https://minecraft.fandom.com/wiki/Bedrock_Dedicated_Server' \
-    | grep -E 'azure.*linux.*\.zip.*' \
-  > /tmp/mc-versioned-urls.html
-} || exit 1
-sed -i -E 's/.*(https:.*\.zip).*/\1/' /tmp/mc-versioned-urls.html
-
-# Let user provide a version, but default to latest available
-if [[ -z "${version:-}" ]]; then
-  version=$(
-    tail -n1 /tmp/mc-versioned-urls.html \
-    | sed -E 's;^.*-([0-9]\..*)\.zip$;\1;'
-  )
-  printf 'Found latest Minecraft Bedrock version to be %s\n' "${version}"
+printf 'Minecraft %s version provided as %s; will try to use that.\n' "${edition^}" "${version}"
+# tail -n1 still here in case your provided version is too short and returns
+# multiple results
+# TODO: The MC wiki does a good job snapshotting specific server versions, so we're using those right now
+# Also, the sed call splits tags onto their own newlines so later regexes don't fight back so hard
+curl -fsSL "https://minecraft.fandom.com/wiki/${edition^}_Edition_${version}" | sed 's/>/>\n/g' > /tmp/mc-wiki-page.html
+if [[ "${edition}" == 'java' ]]; then
+  download_url=$(grep -E -o 'https://.*server\.jar' /tmp/mc-wiki-page.html)
 else
-  printf 'Minecraft Bedrock version provided as %s; will try to use that.\n' "${version}"
-  # tail -n1 still here in case your provided version is too short and returns
-  # multiple results
-  version=$(
-    grep "${version}" /tmp/mc-versioned-urls.html \
-    | tail -n1  \
-    | sed -E 's;^.*-([0-9]\..*)\.zip$;\1;'
-  )
+  download_url=$(grep -E -o 'https://.*bin-linux/.*\.zip' /tmp/mc-wiki-page.html)
 fi
-export version
-download_url=$(grep "${version}" /tmp/mc-versioned-urls.html)
 
 printf 'Will use server version %s, and download from %s\n' "${version}" "${download_url}"
 
 version_short=$(sed -E 's/^([0-9]+\.[0-9]+)\..*$/\1/' <<< "${version}")
 export version_short
-workdir=$(sudo -u "${mcuser}" sh -c 'echo ${HOME}')/minecraft-"${version_short}"
+workdir=$(sudo -u "${mcuser}" sh -c 'echo ${HOME}')/minecraft-"${version_short}"/"${edition}"
 printf 'Setting server working directory as %s\n' "${workdir}"
 export workdir
+mkdir -p "${workdir}"
 
-if [[ -f /tmp/minecraft-"${version}".zip ]]; then
-  printf "Discovered version's zipfile is already on this machine, so skipping download/unzip\n"
+if [[ "${edition}" == 'java' ]]; then
+  if [[ -f "${workdir}"/java-server-"${version}".jar ]]; then
+    printf "Discovered version's server file is already on this machine, so skipping download\n"
+  else
+    printf 'Downloading Minecraft %s server v%s...\n' "${edition^}" "${version}"
+    curl -fsSL -o "${workdir}"/java-server-"${version}".jar "${download_url}" || exit 1
+  fi
 else
-  printf 'Downloading Minecraft Bedrock server v%s...\n' "${version}"
-  curl -fsSL -o /tmp/minecraft-"${version}".zip "${download_url}" || exit 1
-  mkdir -p "${workdir}"
-  unzip -o -q -d "${workdir}"/ /tmp/minecraft-"${version}".zip || exit 1
+  if [[ -f /tmp/minecraft-"${version}".zip ]]; then
+    printf "Discovered version's server file is already on this machine, so skipping download/unzip\n"
+  else
+    printf 'Downloading Minecraft %s server v%s...\n' "${edition^}" "${version}"
+    curl -fsSL -o /tmp/minecraft-"${version}".zip "${download_url}" || exit 1
+    unzip -o -q -d "${workdir}"/ /tmp/minecraft-"${version}".zip || exit 1
+  fi
 fi
 
 ###
@@ -161,27 +164,35 @@ fi
 ###
 
 printf 'Replacing settings files with your own...\n'
-cp /tmp/bedrock-server-cfg/* "${workdir}"/
+cp -r /tmp/server-cfg/"${edition}"/* "${workdir}"/
 
 ###
 
 printf 'Setting permissions on server directory...\n'
-chown -R "${mcuser}:${mcuser}" "${workdir}"
+chown -R "${mcuser}:${mcuser}" /home/"${mcuser}" # "${workdir}"
 
 ###
 
-printf 'Setting up systemd service for Minecraft...\n'
-cat <<EOF >/etc/systemd/system/minecraft-bedrock-server.service
+printf 'Setting up systemd service for Minecraft %s...\n' "${edition^}"
+
+if [[ "${edition}" == 'java' ]]; then
+  memory=$(awk '/MemTotal/ { printf("%.0f", $2 * 0.75 / 1000) }' /proc/meminfo) # listed as kB in that file
+  exec_start="java -Xms${memory}M -Xmx${memory}M -jar ${workdir}/java-server-${version}.jar --nogui"
+else
+  exec_start="${workdir}/bedrock_server"
+fi
+
+cat <<EOF >/etc/systemd/system/minecraft-"${edition}"-server.service
 [Unit]
-Description=Minecraft Bedrock Server
+Description=Minecraft ${edition^} Server
 
 [Service]
-ExecStart=${workdir}/bedrock_server
+ExecStart=${exec_start}
 User=${mcuser}
 Environment=LD_LIBRARY_PATH=${workdir}
 WorkingDirectory=${workdir}
-StandardOutput=file:${workdir}/bedrock-server.log
-StandardError=file:${workdir}/bedrock-server.log
+StandardOutput=file:${workdir}/${edition}-server.log
+StandardError=file:${workdir}/${edition}-server.log
 Restart=always
 RestartSec=5s
 
@@ -190,12 +201,14 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl start minecraft-bedrock-server.service
-systemctl enable minecraft-bedrock-server.service
+systemctl start minecraft-"${edition}"-server.service
+systemctl enable minecraft-"${edition}"-server.service
 
-sleep 3
-systemctl is-active minecraft-bedrock-server.service || {
-  journalctl --no-pager -n10 -u minecraft-bedrock-server.service
+printf 'Waiting for server to start up...\n'
+sleep 10
+systemctl is-active minecraft-"${edition}"-server.service || {
+  printf 'ERROR: Minecraft %s server service did not start successfully!\n' "${edition^}"
+  journalctl --no-pager -n10 -u minecraft-"${edition}"-server.service
   exit 1
 }
 
