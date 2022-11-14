@@ -1,8 +1,8 @@
-Minecraft Bedrock Server Deployment Tools
-=========================================
+Minecraft Server Deployment Tools
+=================================
 
-Deploy your very own Minecraft Bedrock server(s) to play with friends, with just
-a few commands!
+Deploy your very own Minecraft server(s) to play with friends, with just a few
+commands!
 
 Structure & Design
 ------------------
@@ -42,8 +42,8 @@ TODO
 
 For setting server Operators ("admins"), you have to wait for people to connect
 to the server to find their XUIDs to put in your config file. Once you have
-them, add them to your `bedrock-server-cfg/permissions.json` file, and re-run
-the deployment steps.
+them, add them to your `server-cfg/*/permissions.json` file(s), and re-run the
+deployment steps.
 
 Developer Notes
 ---------------

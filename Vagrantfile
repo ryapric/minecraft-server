@@ -1,4 +1,5 @@
-server_version = "1.19.2"
+bedrock_server_version = "1.19.40"
+java_server_version    = "1.19.2"
 
 Vagrant.configure("2") do |config|
   box = "debian/bullseye64"
@@ -26,7 +27,7 @@ Vagrant.configure("2") do |config|
 
     mc.vm.provision "shell",
       inline: <<-SCRIPT
-        bash /tmp/scripts/init.sh bedrock #{server_version} vagrant
+        bash /tmp/scripts/init.sh bedrock #{bedrock_server_version} vagrant
       SCRIPT
   end
 
@@ -35,7 +36,7 @@ Vagrant.configure("2") do |config|
 
     ["tcp", "udp"].each do |protocol|
       mc.vm.network "forwarded_port", guest: 25565, host: 25565, protocol: protocol # Java port
-      mc.vm.network "forwarded_port", guest: 19132, host: 19132, protocol: protocol # Bedrock port
+      mc.vm.network "forwarded_port", guest: 19132, host: 19132 + 1, protocol: protocol # Bedrock port
     end
 
     mc.vm.synced_folder ".", "/vagrant", disabled: true
@@ -45,7 +46,7 @@ Vagrant.configure("2") do |config|
 
     mc.vm.provision "shell",
       inline: <<-SCRIPT
-        bash /tmp/scripts/init.sh java #{server_version} vagrant
+        bash /tmp/scripts/init.sh java #{java_server_version} vagrant
       SCRIPT
   end
 end
