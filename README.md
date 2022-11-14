@@ -48,5 +48,10 @@ the deployment steps.
 Developer Notes
 ---------------
 
-* Java also deployes a [GeyserMC](https://geysermc.org/) server to translate
+TBD.
+
+Roadmap
+-------
+
+* Java to also deploy a [GeyserMC](https://geysermc.org/) server to translate
   packets from Bedrock clients
