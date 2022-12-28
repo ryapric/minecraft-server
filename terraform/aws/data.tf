@@ -8,7 +8,7 @@ data "aws_ami" "latest" {
 
   filter {
     name   = "name"
-    values = ["debian-${var.debian_version_id}*"]
+    values = ["debian-${var.debian_version}-amd64*"]
   }
 
   filter {

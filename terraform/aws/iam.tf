@@ -31,8 +31,8 @@ resource "aws_iam_policy" "main" {
           "s3:PutObject",
         ]
         Resource = [
-          "arn:aws:s3:::minecraft-bedrock-server-backups-${data.aws_caller_identity.current.id}",
-          "arn:aws:s3:::minecraft-bedrock-server-backups-${data.aws_caller_identity.current.id}/*",
+          "arn:aws:s3:::minecraft-server-backups-${data.aws_caller_identity.current.id}",
+          "arn:aws:s3:::minecraft-server-backups-${data.aws_caller_identity.current.id}/*",
         ]
       }
     ]

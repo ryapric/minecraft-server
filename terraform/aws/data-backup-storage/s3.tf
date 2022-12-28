@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket" "main" {
-  bucket = "minecraft-bedrock-server-backups-${data.aws_caller_identity.current.id}"
+  bucket = "minecraft-server-backups-${data.aws_caller_identity.current.id}"
 }
 
 resource "aws_s3_bucket_acl" "main" {

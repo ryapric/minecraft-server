@@ -7,12 +7,12 @@ if [[ -u "${workdir:-}" ]]; then
 fi
 
 # If there's no server.properties in the workdir yet (or if it's using the
-# default leve/world name), check /tmp/bedrock-server-cfg. If neither, exit
+# default leve/world name), check /tmp/server-cfg. If neither, exit
 # gracefully
 if [[ -f "${workdir}"/server.properties ]] && ! grep -q 'level-name=Bedrock level' "${workdir}"/server.properties ; then
   server_properties="${workdir}"/server.properties
-elif [[ -f /tmp/bedrock-server-cfg/server.properties ]]; then
-  server_properties=/tmp/bedrock-server-cfg/server.properties
+elif [[ -f /tmp/server-cfg/bedrock/server.properties ]]; then
+  server_properties=/tmp/server-cfg/bedrock/server.properties
 else
   printf 'No remote backup data exists or is inaccessible; starting with new World\n'
   exit 0
@@ -25,7 +25,7 @@ cmd="${1:-}"
 world_name=$(grep 'level-name' "${server_properties}" | sed -E 's/\s+/_/g' | cut -d'=' -f2) # the sed replaces any whitespace in the server name
 world_name="${world_name,,}"
 account_number=$(aws sts get-caller-identity --query Account --output text)
-bucket="minecraft-bedrock-server-backups-${account_number}"
+bucket="minecraft-server-backups-${account_number}"
 bakfile="${world_name}.tar.gz"
 key="${world_name}/${bakfile}"
 
@@ -46,7 +46,7 @@ elif [[ "${cmd}" == 'restore' ]]; then
     rm -rf "${workdir}"/worlds
     tar -C "${workdir}" -xzf "${workdir}/${bakfile}"
     # TODO: brittle to always succeed, but eh
-    systemctl restart minecraft-bedrock-server.service > /dev/null 2>&1 || true
+    systemctl restart minecraft-"${edition}"-server.service > /dev/null 2>&1 || true
   else
     printf 'No remote backup data exists or is inaccessible; starting with new World\n'
   fi

@@ -4,7 +4,7 @@
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
   tags = {
-    Name = "minecraft-bedrock"
+    Name = "minecraft"
   }
 }
 
@@ -13,7 +13,7 @@ resource "aws_internet_gateway" "main" {
 }
 
 resource "aws_security_group" "main" {
-  description = "SG rules for Minecraft Bedrock server"
+  description = "SG rules for Minecraft server"
   name        = local.name_tag
   vpc_id      = aws_vpc.main.id
 
@@ -53,11 +53,43 @@ resource "aws_security_group_rule" "deployer_ssh" {
   security_group_id = aws_security_group.main.id
 }
 
-resource "aws_security_group_rule" "main" {
+# The following Minecraft server port rules are open to the world, but the
+# access to the server itself is expected to be gated by login ID
+resource "aws_security_group_rule" "bedrock_tcp" {
   type              = "ingress"
-  description       = "Allow Minecraft Bedrock clients"
+  description       = "Allow Minecraft Bedrock clients (TCP)"
   from_port         = 19132
   to_port           = 19132
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.main.id
+}
+
+resource "aws_security_group_rule" "bedrock_udp" {
+  type              = "ingress"
+  description       = "Allow Minecraft Bedrock clients (UDP)"
+  from_port         = 19132
+  to_port           = 19132
+  protocol          = "udp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.main.id
+}
+
+resource "aws_security_group_rule" "java_tcp" {
+  type              = "ingress"
+  description       = "Allow Minecraft Java clients (TCP)"
+  from_port         = 25565
+  to_port           = 25565
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.main.id
+}
+
+resource "aws_security_group_rule" "java_udp" {
+  type              = "ingress"
+  description       = "Allow Minecraft Java clients (UDP)"
+  from_port         = 25565
+  to_port           = 25565
   protocol          = "udp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.main.id

@@ -8,14 +8,14 @@ export version="${2:-}"
 export platform="${3:-}"
 
 if [[ -z "${edition}" ]]; then
-  printf 'ERROR: Minecraft edition (bedrock|java) not set as first arg to init script, aborting\n' > /dev/stderr
+  printf 'ERROR: Minecraft edition (bedrock|java) not set as first arg to init script.\n' > /dev/stderr
   exit 1
 elif [[ ! "${edition}" =~ bedrock|java ]]; then
-  printf 'ERROR: Invalid Minecraft edition, must be one of "bedrock" or "java", aborting\n' > /dev/stderr
+  printf 'ERROR: Invalid Minecraft edition, must be one of "bedrock" or "java"\n' > /dev/stderr
   exit 1
 fi
 if [[ -z "${version}" ]]; then
-  printf 'ERROR: version string not set as second arg to init script, aborting\n' > /dev/stderr
+  printf 'ERROR: version string not set as second arg to init script\n' > /dev/stderr
   exit 1
 fi
 if [[ -z "${platform}" ]]; then
