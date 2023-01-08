@@ -1,0 +1,21 @@
+services:
+
+  minecraft:
+    container_name: minecraft
+    build:
+      args:
+      - edition
+      - version
+    image: 'ryapric/minecraft-server:latest'
+    environment:
+      edition: java
+    # volumes:
+    # - minecraft_server_data:/home/minecraft
+    ports:
+    - '25565:25565/tcp'
+    - '25565:25565/udp'
+    - '19132:19132/tcp'
+    - '19132:19132/udp'
+
+# volumes:
+#   minecraft_server_data: {}

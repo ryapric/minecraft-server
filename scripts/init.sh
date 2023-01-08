@@ -30,7 +30,7 @@ if id -u admin > /dev/null 2>&1 ; then
 elif id -u vagrant > /dev/null 2>&1 ; then
   export mcuser=vagrant
 else
-  export mcuser="${USER}"
+  mcuser=minecraft
 fi
 
 ###
@@ -54,6 +54,7 @@ apt-get install -y \
   curl \
   htop \
   openjdk-17-jre-headless \
+  sudo \
   unzip \
   zip
 
@@ -79,6 +80,9 @@ workdir=$(sudo -u "${mcuser}" sh -c 'echo ${HOME}')/minecraft-"${version_short}"
 printf 'Setting server working directory as %s\n' "${workdir}"
 export workdir
 mkdir -p "${workdir}"
+printf '(also writing that dir name to HOME/workdir-name for other scripts to find it)'
+echo "${workdir}" > /home/"${mcuser}"/workdir-name
+chown "${mcuser}:${mcuser}" /home/"${mcuser}"/workdir-name
 
 if [[ "${edition}" == 'java' ]]; then
   if [[ -f "${workdir}"/java-server-"${version}".jar ]]; then
@@ -173,6 +177,8 @@ chown -R "${mcuser}:${mcuser}" /home/"${mcuser}" # "${workdir}"
 
 ###
 
+if [[ ! "${platform}" =~ docker ]] ; then
+
 printf 'Setting up systemd service for Minecraft %s...\n' "${edition^}"
 
 if [[ "${edition}" == 'java' ]]; then
@@ -211,6 +217,8 @@ systemctl is-active minecraft-"${edition}"-server.service || {
   journalctl --no-pager -n10 -u minecraft-"${edition}"-server.service
   exit 1
 }
+
+fi
 
 ###
 
