@@ -76,28 +76,26 @@ printf 'Will use server version %s, and download from %s\n' "${version}" "${down
 
 version_short=$(sed -E 's/^([0-9]+\.[0-9]+)\..*$/\1/' <<< "${version}")
 export version_short
-workdir=$(sudo -u "${mcuser}" sh -c 'echo ${HOME}')/minecraft-"${version_short}"/"${edition}"
-printf 'Setting server working directory as %s\n' "${workdir}"
-export workdir
-mkdir -p "${workdir}"
-printf '(also writing that dir name to HOME/workdir-name for other scripts to find it)'
-echo "${workdir}" > /home/"${mcuser}"/workdir-name
-chown "${mcuser}:${mcuser}" /home/"${mcuser}"/workdir-name
+mc_root=$(sudo -u "${mcuser}" sh -c 'echo ${HOME}')/minecraft-"${version_short}"
+printf 'Setting server(s) root directory as %s\n' "${mc_root}"
+export mc_root
+mkdir -p "${mc_root}/${edition}"
 
 if [[ "${edition}" == 'java' ]]; then
-  if [[ -f "${workdir}"/java-server-"${version}".jar ]]; then
+  if [[ -f "/tmp/java-server-${version}.jar" ]]; then
     printf "Discovered version's server file is already on this machine, so skipping download\n"
   else
     printf 'Downloading Minecraft %s server v%s...\n' "${edition^}" "${version}"
-    curl -fsSL -o "${workdir}"/java-server-"${version}".jar "${download_url}" || exit 1
+    curl -fsSL -o /tmp//java-server-"${version}".jar "${download_url}" || exit 1
+    cp /tmp/java-server-"${version}".jar "${mc_root}/${edition}/java-server.jar"
   fi
 else
-  if [[ -f /tmp/minecraft-"${version}".zip ]]; then
-    printf "Discovered version's server file is already on this machine, so skipping download/unzip\n"
+  if [[ -f /tmp/minecraft-bedrock-"${version}".zip ]]; then
+    printf "Discovered %s version's server file is already on this machine, so skipping download/unzip\n" "${edition^}"
   else
     printf 'Downloading Minecraft %s server v%s...\n' "${edition^}" "${version}"
-    curl -fsSL -o /tmp/minecraft-"${version}".zip "${download_url}" || exit 1
-    unzip -o -q -d "${workdir}"/ /tmp/minecraft-"${version}".zip || exit 1
+    curl -fsSL -o /tmp/minecraft-bedrock-"${version}".zip "${download_url}" || exit 1
+    unzip -o -q -d "${mc_root}/${edition}/" /tmp/minecraft-bedrock-"${version}".zip || exit 1
   fi
 fi
 
@@ -130,7 +128,8 @@ Before=poweroff.target shutdown.target reboot.target halt.target
 ExecStart=/usr/local/bin/minecraft-backups-s3 backup
 User=${mcuser}
 Type=oneshot
-Environment=workdir=${workdir}
+Environment=mc_root=${mc_root}
+Environment=edition=${edition}
 
 [Install]
 WantedBy=multi-user.target poweroff.target shutdown.target reboot.target halt.target
@@ -151,7 +150,7 @@ WantedBy=timers.target
 EOF
 
 # Idempotent creation of worlds folder, so first backup doesn't show a failure in the logs
-mkdir -p "${workdir}"/worlds
+mkdir -p "${mc_root}/${edition}"/worlds
 
 systemctl enable minecraft-bedrock-server-backup.service # enabled for shutdown-time backup to work
 systemctl start minecraft-bedrock-server-backup.timer
@@ -168,12 +167,12 @@ fi
 ###
 
 printf 'Replacing settings files with your own...\n'
-cp -r /tmp/server-cfg/"${edition}"/* "${workdir}"/
+cp -r /tmp/server-cfg/"${edition}"/* "${mc_root}"/"${edition}"
 
 ###
 
 printf 'Setting permissions on server directory...\n'
-chown -R "${mcuser}:${mcuser}" /home/"${mcuser}" # "${workdir}"
+chown -R "${mcuser}:${mcuser}" /home/"${mcuser}"
 
 ###
 
@@ -183,9 +182,9 @@ printf 'Setting up systemd service for Minecraft %s...\n' "${edition^}"
 
 if [[ "${edition}" == 'java' ]]; then
   memory=$(awk '/MemTotal/ { printf("%.0f", $2 * 0.75 / 1000) }' /proc/meminfo) # listed as kB in that file
-  exec_start="java -Xms${memory}M -Xmx${memory}M -jar ${workdir}/java-server-${version}.jar --nogui"
+  exec_start="java -Xms${memory}M -Xmx${memory}M -jar ${mc_root}/${edition}/java-server-${version}.jar --nogui"
 else
-  exec_start="${workdir}/bedrock_server"
+  exec_start="${mc_root}/${edition}/bedrock_server"
 fi
 
 cat <<EOF >/etc/systemd/system/minecraft-"${edition}"-server.service
@@ -195,10 +194,10 @@ Description=Minecraft ${edition^} Server
 [Service]
 ExecStart=${exec_start}
 User=${mcuser}
-Environment=LD_LIBRARY_PATH=${workdir}
-WorkingDirectory=${workdir}
-StandardOutput=file:${workdir}/${edition}-server.log
-StandardError=file:${workdir}/${edition}-server.log
+Environment=LD_LIBRARY_PATH=${mc_root}
+WorkingDirectory=${mc_root}/${edition}
+StandardOutput=file:${mc_root}/${edition}-server.log
+StandardError=file:${mc_root}/${edition}-server.log
 Restart=always
 RestartSec=5s
 
@@ -222,4 +221,4 @@ fi
 
 ###
 
-printf 'All done! Your Minecraft World "%s" should be running!\n' "$(grep 'level-name' "${workdir}"/server.properties | awk -F= '{ print $2 }')"
+printf 'All done! Your Minecraft World "%s" should be running!\n' "$(grep 'level-name' "${mc_root}/${edition}"/server.properties | awk -F= '{ print $2 }')"
