@@ -30,7 +30,7 @@ if id -u admin > /dev/null 2>&1 ; then
 elif id -u vagrant > /dev/null 2>&1 ; then
   export mcuser=vagrant
 else
-  mcuser=minecraft
+  export mcuser=minecraft
 fi
 
 ###
@@ -176,13 +176,19 @@ chown -R "${mcuser}:${mcuser}" /home/"${mcuser}"
 
 ###
 
+printf 'Setting memory limits in case Java edition is running...\n'
+# 75% of max, transformed because mem is listed as kB in meminfo
+memory_limit=$(awk '/MemTotal/ { printf("%.0f", $2 * 0.75 / 1000) }' /proc/meminfo)
+export memory_limit
+
+###
+
 if [[ ! "${platform}" =~ docker ]] ; then
 
 printf 'Setting up systemd service for Minecraft %s...\n' "${edition^}"
 
 if [[ "${edition}" == 'java' ]]; then
-  memory=$(awk '/MemTotal/ { printf("%.0f", $2 * 0.75 / 1000) }' /proc/meminfo) # listed as kB in that file
-  exec_start="java -Xms${memory}M -Xmx${memory}M -jar ${mc_root}/${edition}/java-server-${version}.jar --nogui"
+  exec_start="java -Xms${memory_limit}M -Xmx${memory_limit}M -jar ${mc_root}/${edition}/java-server-${version}.jar --nogui"
 else
   exec_start="${mc_root}/${edition}/bedrock_server"
 fi
