@@ -1,5 +1,11 @@
-bedrock_server_version = "1.19.40"
-java_server_version    = "1.19.2"
+# You can set these yourself, but they're expected to be passed in the Makefile
+bedrock_version = ENV["BEDROCK_VERSION"]
+java_version    = ENV["JAVA_VERSION"]
+
+if not bedrock_version or not java_version
+  puts "You must provide version strings for the Minecraft server editions -- did you forget to call this from the Makefile?"
+  exit 1
+end
 
 Vagrant.configure("2") do |config|
   box = "debian/bullseye64"
@@ -27,7 +33,7 @@ Vagrant.configure("2") do |config|
 
     mc.vm.provision "shell",
       inline: <<-SCRIPT
-        bash /tmp/scripts/init.sh bedrock #{bedrock_server_version} vagrant
+        bash /tmp/scripts/init.sh bedrock #{bedrock_version} vagrant
       SCRIPT
   end
 
@@ -46,7 +52,7 @@ Vagrant.configure("2") do |config|
 
     mc.vm.provision "shell",
       inline: <<-SCRIPT
-        bash /tmp/scripts/init.sh java #{java_server_version} vagrant
+        bash /tmp/scripts/init.sh java #{java_version} vagrant
       SCRIPT
   end
 end

@@ -13,8 +13,12 @@ docker:
 	docker compose run minecraft $(edition)
 
 vagrant:
+	BEDROCK_VERSION=$(BEDROCK_VERSION) \
+	JAVA_VERSION=$(JAVA_VERSION) \
 	vagrant up $(edition)
 
 stop:
 	docker compose down || true
+	BEDROCK_VERSION=$(BEDROCK_VERSION) \
+	JAVA_VERSION=$(JAVA_VERSION) \
 	vagrant destroy -f || true
