@@ -3,12 +3,14 @@ AWS
 
 `[ IN PROGRESS ]`
 
-To deploy this Terraform config to AWS, you'll need the following in addition to
-the core requirements listed in the root `README`:
+To deploy this Terraform config to AWS, you'll need the following:
 
+* Terraform
+* An `ssh` client
 * An AWS account
-* Credentials that allow your local machine to create/destroy AWS resources. It
-  doesn't matter what kind, since the `backend.tf` config is an empty `s3 {}`
-  block.
+* An AWS IAM User or assumable Role (User is easier, if it's just for this use
+  case)
+* Appropriate IAM permissions for your User/Role to manage the lifecycle of the
+      AWS resources
 
 CHECK OUT `data-backup-storage` FIRST!!!

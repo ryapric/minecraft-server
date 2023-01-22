@@ -18,6 +18,5 @@ WORKDIR /home/minecraft
 
 COPY ./scripts/docker-entrypoint.sh /home/minecraft/docker-entrypoint.sh
 
-ENV edition=""
-
-CMD ["sh", "-c", "bash /home/minecraft/docker-entrypoint.sh ${edition}"]
+ENTRYPOINT ["/home/minecraft/docker-entrypoint.sh"]
+CMD [""]

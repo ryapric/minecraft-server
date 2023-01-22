@@ -6,6 +6,10 @@ if [[ -z "${edition}" ]] ; then
   printf 'ERROR: Minecraft edition (bedrock|java) not provided as script arg.\n'
   exit 1
 fi
+if [[ ! "${edition}" =~ bedrock|java ]]; then
+  printf 'ERROR: Invalid Minecraft edition, must be one of "bedrock" or "java"\n' > /dev/stderr
+  exit 1
+fi
 
 # TODO: this will only find the latest -- there should only ever be one, but.
 mc_root="$(find /home/minecraft -maxdepth 1 -type d -name 'minecraft-*' | tail -n1)"

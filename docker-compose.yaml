@@ -2,15 +2,12 @@ services:
 
   minecraft:
     container_name: minecraft
-    build:
-      args:
-      - edition
-      - version
+    # image expected to be built using `make build-docker` instead of mucking
+    # around with a build key & args here
     image: 'ryapric/minecraft-server:latest'
-    environment:
-      edition: java
+    # TODO: figure this out
     # volumes:
-    # - minecraft_server_data:/home/minecraft
+    # - minecraft_server_backup_data:/home/minecraft
     ports:
     - '25565:25565/tcp'
     - '25565:25565/udp'
@@ -18,4 +15,4 @@ services:
     - '19132:19132/udp'
 
 # volumes:
-#   minecraft_server_data: {}
+#   minecraft_server_backup_data: {}
