@@ -61,7 +61,6 @@ apt-get install -y \
 ###
 
 printf 'Minecraft %s version provided as %s; will try to use that.\n' "${edition^}" "${version}"
-# tail -n1 still here in case your provided version is too short and returns
 # multiple results
 # TODO: The MC wiki does a good job snapshotting specific server versions, so we're using those right now
 # Also, the sed call splits tags onto their own newlines so later regexes don't fight back so hard
