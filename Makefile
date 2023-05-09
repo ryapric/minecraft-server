@@ -1,7 +1,9 @@
 SHELL := /usr/bin/env bash -euo pipefail
 
-BEDROCK_VERSION ?= 1.19.40
-JAVA_VERSION ?= 1.19.2
+# These need to be separate because the lookup behavior for each of them is
+# different -- Bedrock needs Major-Minor-Patch, Java just needs Major-Minor
+BEDROCK_VERSION ?= 1.19.80
+JAVA_VERSION ?= 1.19
 
 docker:
 	docker build \

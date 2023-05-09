@@ -43,7 +43,7 @@ if [[ -d ./server-cfg/"${edition}" ]] ; then
   export cfg_root='./server-cfg'
 else
   export cfg_root='/tmp/server-cfg'
-  until [[ -d /tmp/server-cfg/"${edition}" ]]; do
+  until [[ -d "${cfg_root}/${edition}" ]]; do
     printf 'Waiting for Minecraft %s config files to land on the host...\n' "${edition^}"
     sleep 5
   done
@@ -77,11 +77,20 @@ printf 'Minecraft %s version provided as %s; will try to use that.\n' "${edition
 # multiple results
 # TODO: The MC wiki does a good job snapshotting specific server versions, so we're using those right now
 # Also, the sed call splits tags onto their own newlines so later regexes don't fight back so hard
-curl -fsSL "https://minecraft.fandom.com/wiki/${edition^}_Edition_${version}" | sed 's/>/>\n/g' > /tmp/mc-wiki-page.html
 if [[ "${edition}" == 'java' ]]; then
-  download_url=$(grep -E -o 'https://.*server\.jar' /tmp/mc-wiki-page.html)
+  download_url=$(
+    curl -fsSL "https://minecraft.fandom.com/wiki/Java_Edition_${version}" \
+    | grep "${version}" \
+    | sed 's/>/>\n/g' \
+    | grep -E -o 'https://.*?server\.jar'
+  )
 else
-  download_url=$(grep -E -o 'https://.*bin-linux/.*\.zip' /tmp/mc-wiki-page.html)
+  download_url=$(
+    curl -fsSL "https://minecraft.fandom.com/wiki/Bedrock_Dedicated_Server" \
+    | sed 's/>/>\n/g' \
+    | grep "${version}" \
+    | grep -E -o 'https://.*bin-linux/.*\.zip'
+  )
 fi
 
 printf 'Will use server version %s, and download from %s\n' "${version}" "${download_url}"
