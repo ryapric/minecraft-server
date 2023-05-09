@@ -18,7 +18,11 @@ vagrant:
 	vagrant up $(edition)
 
 local:
-	if [[ $(edition) == 'bedrock' ]] ; then version=$(BEDROCK_VERSION) ; else version=$(JAVA_VERSION) ; fi
+	if [[ $(edition) == 'bedrock' ]] ; then \
+		version=$(BEDROCK_VERSION) ; \
+	else \
+		version=$(JAVA_VERSION) ; \
+	fi ; \
 	./scripts/init.sh bedrock "$${version}" local
 
 stop:

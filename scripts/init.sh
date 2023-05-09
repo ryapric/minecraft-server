@@ -42,7 +42,7 @@ cfg_root=''
 if [[ -d ./server-cfg/"${edition}" ]] ; then
   export cfg_root='./server-cfg'
 else
-  export cfg_root=/tmp/server-cfg'
+  export cfg_root='/tmp/server-cfg'
   until [[ -d /tmp/server-cfg/"${edition}" ]]; do
     printf 'Waiting for Minecraft %s config files to land on the host...\n' "${edition^}"
     sleep 5
