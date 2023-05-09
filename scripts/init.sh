@@ -35,16 +35,26 @@ fi
 
 ###
 
-until [[ -d /tmp/server-cfg/"${edition}" ]]; do
-  printf 'Waiting for Minecraft %s config files to land on the host...\n' "${edition^}"
-  sleep 5
-done
+cfg_root=''
+# If user runs the init from the repo directory itself (e.g. for a local setup),
+# then we have the files we need. Otherwise, assume that the files are being
+# pushed up and we need to wait on them
+if [[ -d ./server-cfg/"${edition}" ]] ; then
+  export cfg_root='./server-cfg'
+else
+  export cfg_root=/tmp/server-cfg'
+  until [[ -d /tmp/server-cfg/"${edition}" ]]; do
+    printf 'Waiting for Minecraft %s config files to land on the host...\n' "${edition^}"
+    sleep 5
+  done
+fi
 
 ###
 
-printf 'Moving this script to a permanent location (%s) if you need it later...\n' /usr/local/bin/minecraft-init
-cp "${BASH_SOURCE[0]}" /usr/local/bin/minecraft-init || true
-chmod +x /usr/local/bin/minecraft-init
+# # TODO: figure out when you would vs. would not want this
+# printf 'Moving this script to a permanent location (%s) if you need it later...\n' /usr/local/bin/minecraft-init
+# cp "${BASH_SOURCE[0]}" /usr/local/bin/minecraft-init || true
+# chmod +x /usr/local/bin/minecraft-init
 
 ###
 
@@ -53,10 +63,13 @@ apt-get update
 apt-get install -y \
   curl \
   htop \
-  openjdk-17-jre-headless \
   sudo \
   unzip \
   zip
+if [[ "${edition}" == 'java' ]] ; then
+  apt-get install -y \
+    openjdk-17-jre-headless
+fi
 
 ###
 
@@ -166,7 +179,7 @@ fi
 ###
 
 printf 'Replacing settings files with your own...\n'
-cp -r /tmp/server-cfg/"${edition}"/* "${mc_root}"/"${edition}"
+cp -r "${cfg_root}/${edition}"/* "${mc_root}"/"${edition}"
 
 ###
 
