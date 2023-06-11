@@ -8,7 +8,7 @@ if not bedrock_version or not java_version
 end
 
 Vagrant.configure("2") do |config|
-  box = "debian/bullseye64"
+  box = "debian/bookworm64"
 
   config.vm.provider "virtualbox" do |vb|
     vb.cpus   = 2
