@@ -19,4 +19,3 @@ WORKDIR /home/minecraft
 COPY ./scripts/docker-entrypoint.sh /home/minecraft/docker-entrypoint.sh
 
 ENTRYPOINT ["/home/minecraft/docker-entrypoint.sh"]
-CMD [""]

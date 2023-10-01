@@ -15,7 +15,7 @@ fi
 mc_root="$(find /home/minecraft -maxdepth 1 -type d -name 'minecraft-*' | tail -n1)"
 cd "${mc_root}/${edition}" || exit 1
 
-exec_start_file=/tmp/start.sh
+exec_start_file="${HOME}/start.sh"
 
 if [[ "${edition}" == 'bedrock' ]] ; then
   exec_start="LD_LIBRARY_PATH=. ./bedrock_server"
@@ -29,5 +29,4 @@ else
   exit 1
 fi
 
-echo "${exec_start}" > "${exec_start_file}"
 bash "${exec_start_file}"

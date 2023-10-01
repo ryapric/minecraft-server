@@ -5,14 +5,13 @@ services:
     # image expected to be built using `make build-docker` instead of mucking
     # around with a build key & args here
     image: 'ryapric/minecraft-server:latest'
-    # TODO: figure this out
-    # volumes:
-    # - minecraft_server_backup_data:/home/minecraft
+    volumes:
+    - minecraft_server_backup_data:/home/minecraft
     ports:
     - '25565:25565/tcp'
     - '25565:25565/udp'
     - '19132:19132/tcp'
     - '19132:19132/udp'
 
-# volumes:
-#   minecraft_server_backup_data: {}
+volumes:
+  minecraft_server_backup_data: {}

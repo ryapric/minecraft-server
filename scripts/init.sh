@@ -79,17 +79,19 @@ printf 'Minecraft %s version provided as %s; will try to use that.\n' "${edition
 # Also, the sed call splits tags onto their own newlines so later regexes don't fight back so hard
 if [[ "${edition}" == 'java' ]]; then
   download_url=$(
-    curl -fsSL "https://minecraft.fandom.com/wiki/Java_Edition_${version}" \
+    curl -fsSL "https://minecraft.wiki/w/Java_Edition_${version}" \
     | grep "${version}" \
     | sed 's/>/>\n/g' \
-    | grep -E -o 'https://.*?server\.jar'
+    | grep -E -o 'https://.*?server\.jar' \
+    | tail -n1
   )
 else
   download_url=$(
-    curl -fsSL "https://minecraft.fandom.com/wiki/Bedrock_Dedicated_Server" \
+    curl -fsSL "https://minecraft.wiki/w/Bedrock_Dedicated_Server" \
     | sed 's/>/>\n/g' \
     | grep "${version}" \
-    | grep -E -o 'https://.*bin-linux/.*\.zip'
+    | grep -E -o 'https://.*bin-linux(-preview?)/.*\.zip' \
+    | tail -n1
   )
 fi
 
