@@ -10,6 +10,7 @@ services:
         bedrock_version: "${BEDROCK_VERSION}"
         java_version: "${JAVA_VERSION}"
         hostuid: "${hostuid}"
+      network: 'host'
     image: 'ryapric/minecraft-server:latest'
     command: "${edition}" # provided by Makefile
     volumes:
