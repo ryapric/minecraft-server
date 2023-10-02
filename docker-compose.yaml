@@ -4,11 +4,23 @@ services:
     container_name: minecraft
     # image expected to be built using `make build-docker` instead of mucking
     # around with a build key & args here
+    build:
+      context: .
+      args:
+        bedrock_version: "${BEDROCK_VERSION}"
+        java_version: "${JAVA_VERSION}"
+        hostuid: "${hostuid}"
     image: 'ryapric/minecraft-server:latest'
+    command: "${edition}" # provided by Makefile
     volumes:
     - ./data:/home/minecraft/data
-    ports:
-    - '25565:25565/tcp'
-    - '25565:25565/udp'
-    - '19132:19132/tcp'
-    - '19132:19132/udp'
+    # These are kept here in case you need to disable `host` mode below
+    # ports:
+    # - '25565:25565/tcp'
+    # - '25565:25565/udp'
+    # - '19132:19132/tcp'
+    # - '19132:19132/udp'
+    # `host` is set in case this image is building/running in a homelab running
+    # nonstandard DNS (e.g. Pi-Hole), and the container needs to resolve to
+    # something reachable. If something about this breaks, take that line out
+    network_mode: 'host'
