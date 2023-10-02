@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash -euo pipefail
 # different -- Bedrock needs Major-Minor-Patch, Java just needs Major-Minor
 BEDROCK_VERSION ?= 1.20.30
 JAVA_VERSION ?= 1.20
-ediiton ?= bedrock
+edition ?= bedrock
 
 docker:
 	docker build \
@@ -14,7 +14,12 @@ docker:
 		-t ryapric/minecraft-server:$(BEDROCK_VERSION)_$(JAVA_VERSION) \
 		.
 	docker tag ryapric/minecraft-server:$(BEDROCK_VERSION)_$(JAVA_VERSION) ryapric/minecraft-server:latest
-	docker compose run --service-ports minecraft $(edition)
+	docker compose run \
+		--name minecraft \
+		--service-ports \
+		--rm \
+		-d \
+		minecraft $(edition)
 
 vagrant:
 	BEDROCK_VERSION=$(BEDROCK_VERSION) \
@@ -25,9 +30,6 @@ aws:
 	terraform -chdir=./terraform/aws init -backend-config=backend.tfvars
 	terraform -chdir=./terraform/aws apply
 
-stop-aws:
-	terraform -chdir=terraform destroy
-
 local:
 	if [[ $(edition) == 'bedrock' ]] ; then \
 		version=$(BEDROCK_VERSION) ; \
@@ -36,8 +38,9 @@ local:
 	fi ; \
 	./scripts/init.sh bedrock "$${version}" local
 
-stop-local:
+stop:
 	docker compose down || true
+	docker stop minecraft || true
 	BEDROCK_VERSION=$(BEDROCK_VERSION) \
 	JAVA_VERSION=$(JAVA_VERSION) \
 	vagrant destroy -f || true

@@ -1,0 +1,4 @@
+This is just a placeholder file to make sure the `data/` directory exists on the
+host before container start-time, since otherwise permission errors rear up
+because the container runtime will make `data/` itself, which will have root
+ownership. And then things fail, yadda yadda.

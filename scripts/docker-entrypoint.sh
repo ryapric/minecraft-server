@@ -11,14 +11,16 @@ if [[ ! "${edition}" =~ bedrock|java ]]; then
   exit 1
 fi
 
-# TODO: this will only find the latest -- there should only ever be one, but.
-mc_root="$(find /home/minecraft -maxdepth 1 -type d -name 'minecraft-*' | tail -n1)"
+mc_root="$(find "${HOME}" -maxdepth 1 -type d -name 'minecraft-*' | tail -n1)"
 cd "${mc_root}/${edition}" || exit 1
 
 exec_start_file="${HOME}/start.sh"
 
 if [[ "${edition}" == 'bedrock' ]] ; then
-  exec_start="LD_LIBRARY_PATH=. ./bedrock_server"
+  # Need to copy data from the installed directory to the one we mount -- can't
+  # just mount directly or else it wiped the dir
+  cp -r "${mc_root}"/bedrock/* "${HOME}"/data
+  exec_start="LD_LIBRARY_PATH=${mc_root} ${mc_root}/bedrock/bedrock_server"
   echo "${exec_start}" > "${exec_start_file}"
 elif [[ "${edition}" == 'java' ]] ; then
   memory=$(awk '/MemTotal/ { printf("%.0f", $2 * 0.75 / 1000) }' /proc/meminfo) # listed as kB in that file
@@ -29,4 +31,5 @@ else
   exit 1
 fi
 
+cd "${HOME}"/data || exit 1
 bash "${exec_start_file}"
