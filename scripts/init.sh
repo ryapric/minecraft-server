@@ -74,14 +74,15 @@ fi
 ###
 
 printf 'Minecraft %s version provided as %s; will try to use that.\n' "${edition^}" "${version}"
-# multiple results
-# TODO: The MC wiki does a good job snapshotting specific server versions, so we're using those right now
-# Also, the sed call splits tags onto their own newlines so later regexes don't fight back so hard
+# TODO: The MC wiki does a good job snapshotting specific server versions, so
+# we're using those right now Also, the sed call splits tags onto their own
+# newlines so later regexes don't fight back so hard
 if [[ "${edition}" == 'java' ]]; then
   download_url=$(
     curl -fsSL "https://minecraft.wiki/w/Java_Edition_${version}" \
     | grep "${version}" \
     | sed 's/>/>\n/g' \
+    | grep -E -o '<a .*https://.*?server\.jar">' \
     | grep -E -o 'https://.*?server\.jar' \
     | tail -n1
   )
@@ -90,6 +91,7 @@ else
     curl -fsSL "https://minecraft.wiki/w/Bedrock_Dedicated_Server" \
     | sed 's/>/>\n/g' \
     | grep "${version}" \
+    | grep -E -o '<a .*https://.*bin-linux(-preview?)/.*\.zip">' \
     | grep -E -o 'https://.*bin-linux(-preview?)/.*\.zip' \
     | tail -n1
   )

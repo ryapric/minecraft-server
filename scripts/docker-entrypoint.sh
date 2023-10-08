@@ -11,15 +11,21 @@ if [[ ! "${edition}" =~ bedrock|java ]]; then
   exit 1
 fi
 
+if [[ -z "${world_data_dir:-'data/default'}" ]] ; then
+  # shellcheck disable=SC2016
+  printf 'NOTE: ${world_data_dir} is unset, so will use default of ./data/default\n'
+fi
+runtime_root="${HOME}/${world_data_dir}"
+mkdir -p "${runtime_root}"
+
 mc_root="$(find "${HOME}" -maxdepth 1 -type d -name 'minecraft-*' | tail -n1)"
-cd "${mc_root}/${edition}" || exit 1
 
 exec_start_file="${HOME}/start.sh"
 
 if [[ "${edition}" == 'bedrock' ]] ; then
   # Need to copy data from the installed directory to the one we mount -- can't
   # just mount directly or else it wiped the dir
-  cp -r "${mc_root}"/bedrock/* "${HOME}"/data
+  cp -r "${mc_root}"/bedrock/* "${runtime_root}"
   exec_start="LD_LIBRARY_PATH=${mc_root} ${mc_root}/bedrock/bedrock_server"
   echo "${exec_start}" > "${exec_start_file}"
 elif [[ "${edition}" == 'java' ]] ; then
@@ -31,5 +37,5 @@ else
   exit 1
 fi
 
-cd "${HOME}"/data || exit 1
+cd "${runtime_root}" || exit 1
 bash "${exec_start_file}"

@@ -6,22 +6,31 @@ services:
     # around with a build key & args here
     build:
       context: .
+      # Need to set these for both build-time and runtime
       args:
-        bedrock_version: "${BEDROCK_VERSION}"
-        java_version: "${JAVA_VERSION}"
+        bedrock_version: "${bedrock_version}"
+        java_version: "${java_version}"
         hostuid: "${hostuid}"
-      network: 'host'
+        edition: "${edition}"
+        world_data_dir: "${world_data_dir}"
+      network: 'host' # see below for why
+    environment:
+      bedrock_version: "${bedrock_version}"
+      java_version: "${java_version}"
+      hostuid: "${hostuid}"
+      edition: "${edition}"
+      world_data_dir: "${world_data_dir}"
     image: 'ryapric/minecraft-server:latest'
     command: "${edition}" # provided by Makefile
     volumes:
-    - ./data:/home/minecraft/data
-    # These are kept here in case you need to disable `host` mode below
+    - './${world_data_dir}:/home/minecraft/${world_data_dir}'
+    # `host` is set here in case this image is building/running in e.g. a
+    # homelab running nonstandard DNS (e.g. Pi-Hole), and the container needs to
+    # resolve to something reachable. If something about this breaks, take this
+    # line out and replace it with the ports section below.
+    network_mode: 'host'
     # ports:
     # - '25565:25565/tcp'
     # - '25565:25565/udp'
     # - '19132:19132/tcp'
     # - '19132:19132/udp'
-    # `host` is set in case this image is building/running in a homelab running
-    # nonstandard DNS (e.g. Pi-Hole), and the container needs to resolve to
-    # something reachable. If something about this breaks, take that line out
-    network_mode: 'host'

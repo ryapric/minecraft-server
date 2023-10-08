@@ -1,6 +1,6 @@
 # You can set these yourself, but they're expected to be passed in the Makefile
-bedrock_version = ENV["BEDROCK_VERSION"]
-java_version    = ENV["JAVA_VERSION"]
+bedrock_version = ENV["bedrock_version"]
+java_version    = ENV["java_version"]
 
 if not bedrock_version or not java_version
   puts "WARNING: You typically must provide version strings for the Minecraft server editions -- did you forget to call this from the Makefile?"
