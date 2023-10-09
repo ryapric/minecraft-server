@@ -34,3 +34,5 @@ services:
     # - '25565:25565/udp'
     # - '19132:19132/tcp'
     # - '19132:19132/udp'
+    stdin_open: true
+    tty: true
