@@ -8,18 +8,18 @@ export version="${2:-}"
 export platform="${3:-}"
 
 if [[ -z "${edition}" ]]; then
-  printf 'ERROR: Minecraft edition (bedrock|java) not set as first arg to init script.\n' > /dev/stderr
+  printf '>>> ERROR: Minecraft edition (bedrock|java) not set as first arg to init script.\n' > /dev/stderr
   exit 1
 elif [[ ! "${edition}" =~ bedrock|java ]]; then
-  printf 'ERROR: Invalid Minecraft edition, must be one of "bedrock" or "java"\n' > /dev/stderr
+  printf '>>> ERROR: Invalid Minecraft edition, must be one of "bedrock" or "java"\n' > /dev/stderr
   exit 1
 fi
 if [[ -z "${version}" ]]; then
-  printf 'ERROR: version string not set as second arg to init script\n' > /dev/stderr
+  printf '>>> ERROR: version string not set as second arg to init script\n' > /dev/stderr
   exit 1
 fi
 if [[ -z "${platform}" ]]; then
-  printf 'WARNING: platform not set as third arg to init script, so some features (like backups) will not be enabled\n' > /dev/stderr
+  printf '>>> WARNING: platform not set as third arg to init script, so some features (like backups) will not be enabled\n' > /dev/stderr
 else
   printf "Platform '%s' provided to init script; will try to set up associated features if applicable\n" "${platform}"
 fi
@@ -44,7 +44,7 @@ if [[ -d ./server-cfg/"${edition}" ]] ; then
 else
   export cfg_root='/tmp/server-cfg'
   until [[ -d "${cfg_root}/${edition}" ]]; do
-    printf 'Waiting for Minecraft %s config files to land on the host...\n' "${edition^}"
+    printf '>>> Waiting for Minecraft %s config files to land on the host...\n' "${edition^}"
     sleep 5
   done
 fi
@@ -52,13 +52,13 @@ fi
 ###
 
 # # TODO: figure out when you would vs. would not want this
-# printf 'Moving this script to a permanent location (%s) if you need it later...\n' /usr/local/bin/minecraft-init
+# printf '>>> Moving this script to a permanent location (%s) if you need it later...\n' /usr/local/bin/minecraft-init
 # cp "${BASH_SOURCE[0]}" /usr/local/bin/minecraft-init || true
 # chmod +x /usr/local/bin/minecraft-init
 
 ###
 
-printf 'Setting up some system utilities...\n'
+printf '>>> Setting up some system utilities...\n'
 apt-get update
 apt-get install -y \
   curl \
@@ -73,7 +73,7 @@ fi
 
 ###
 
-printf 'Minecraft %s version provided as %s; will try to use that.\n' "${edition^}" "${version}"
+printf '>>> Minecraft %s version provided as %s; will try to use that.\n' "${edition^}" "${version}"
 # TODO: The MC wiki does a good job snapshotting specific server versions, so
 # we're using those right now Also, the sed call splits tags onto their own
 # newlines so later regexes don't fight back so hard
@@ -97,12 +97,12 @@ else
   )
 fi
 
-printf 'Will use server version %s, and download from %s\n' "${version}" "${download_url}"
+printf '>>> Will use server version %s, and download from %s\n' "${version}" "${download_url}"
 
 version_short=$(sed -E 's/^([0-9]+\.[0-9]+)\..*$/\1/' <<< "${version}")
 export version_short
 mc_root=$(sudo -u "${mcuser}" sh -c 'echo ${HOME}')/minecraft-"${version_short}"
-printf 'Setting server(s) root directory as %s\n' "${mc_root}"
+printf '>>> Setting server(s) root directory as %s\n' "${mc_root}"
 export mc_root
 mkdir -p "${mc_root}/${edition}"
 
@@ -110,7 +110,7 @@ if [[ "${edition}" == 'java' ]]; then
   if [[ -f "/tmp/java-server-${version}.jar" ]]; then
     printf "Discovered version's server file is already on this machine, so skipping download\n"
   else
-    printf 'Downloading Minecraft %s server v%s...\n' "${edition^}" "${version}"
+    printf '>>> Downloading Minecraft %s server v%s...\n' "${edition^}" "${version}"
     curl -fsSL -o /tmp//java-server-"${version}".jar "${download_url}" || exit 1
     cp /tmp/java-server-"${version}".jar "${mc_root}/${edition}/java-server.jar"
   fi
@@ -118,7 +118,7 @@ else
   if [[ -f /tmp/minecraft-bedrock-"${version}".zip ]]; then
     printf "Discovered %s version's server file is already on this machine, so skipping download/unzip\n" "${edition^}"
   else
-    printf 'Downloading Minecraft %s server v%s...\n' "${edition^}" "${version}"
+    printf '>>> Downloading Minecraft %s server v%s...\n' "${edition^}" "${version}"
     curl -fsSL -o /tmp/minecraft-bedrock-"${version}".zip "${download_url}" || exit 1
     unzip -o -q -d "${mc_root}/${edition}/" /tmp/minecraft-bedrock-"${version}".zip || exit 1
   fi
@@ -130,13 +130,13 @@ fi
 if [[ "${platform}" == 'aws' ]]; then
 
 command -v aws > /dev/null || {
-  printf 'Trying to get the latest version of the AWS CLI...\n'
+  printf '>>> Trying to get the latest version of the AWS CLI...\n'
   curl -fsSL 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o /tmp/awscliv2.zip
   unzip -o -q -d /tmp /tmp/awscliv2.zip || exit 1
   sudo /tmp/aws/install
 }
 
-printf 'Setting up world data backup service...\n'
+printf '>>> Setting up world data backup service...\n'
 cp /tmp/scripts/backups-s3.sh /usr/local/bin/minecraft-backups-s3
 chmod +x /usr/local/bin/minecraft-backups-s3
 
@@ -183,7 +183,7 @@ systemctl enable minecraft-bedrock-server-backup.timer
 
 ###
 
-printf 'Checking if remote world data exists and needs to be restored...\n'
+printf '>>> Checking if remote world data exists and needs to be restored...\n'
 /usr/local/bin/minecraft-backups-s3 restore
 
 # END platform fork
@@ -191,17 +191,17 @@ fi
 
 ###
 
-printf 'Replacing settings files with your own...\n'
+printf '>>> Replacing settings files with your own...\n'
 cp -r "${cfg_root}/${edition}"/* "${mc_root}"/"${edition}"
 
 ###
 
-printf 'Setting permissions on server directory...\n'
+printf '>>> Setting permissions on server directory...\n'
 chown -R "${mcuser}:${mcuser}" /home/"${mcuser}"
 
 ###
 
-printf 'Setting memory limits in case Java edition is running...\n'
+printf '>>> Setting memory limits in case Java edition is running...\n'
 # TODO: make overridable later, but use half of host memory
 memory_limit=$(awk '/MemTotal/ { printf("%.0f", $2 * 0.5 / 1000) }' /proc/meminfo)
 export memory_limit
@@ -210,7 +210,7 @@ export memory_limit
 
 if [[ ! "${platform}" =~ docker ]] ; then
 
-printf 'Setting up systemd service for Minecraft %s...\n' "${edition^}"
+printf '>>> Setting up systemd service for Minecraft %s...\n' "${edition^}"
 
 if [[ "${edition}" == 'java' ]]; then
   exec_start="java -Xms${memory_limit}M -Xmx${memory_limit}M -jar ${mc_root}/${edition}/java-server-${version}.jar --nogui"
@@ -240,10 +240,10 @@ systemctl daemon-reload
 systemctl start minecraft-"${edition}"-server.service
 systemctl enable minecraft-"${edition}"-server.service
 
-printf 'Waiting for server to start up...\n'
+printf '>>> Waiting for server to start up...\n'
 sleep 10
 systemctl is-active minecraft-"${edition}"-server.service || {
-  printf 'ERROR: Minecraft %s server service did not start successfully!\n' "${edition^}"
+  printf '>>> ERROR: Minecraft %s server service did not start successfully!\n' "${edition^}"
   journalctl --no-pager -n10 -u minecraft-"${edition}"-server.service
   exit 1
 }
@@ -252,4 +252,4 @@ fi
 
 ###
 
-printf 'All done! Your Minecraft World "%s" should be running!\n' "$(grep 'level-name' "${mc_root}/${edition}"/server.properties | awk -F= '{ print $2 }')"
+printf '>>> All done! Your Minecraft World "%s" should be running!\n' "$(grep 'level-name' "${mc_root}/${edition}"/server.properties | awk -F= '{ print $2 }')"

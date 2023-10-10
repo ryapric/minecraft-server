@@ -49,7 +49,7 @@ local:
 # As indicated by the name, this does NOT copy world data -- that's risky
 # business that I don't want to deal with accidentally overwriting
 copy-code-to-remote:
-	@if [[ -z "$${remote:-}" ]] ; then printf 'Must set $$remote env var\n' && exit 1 ; fi
+	@if [[ -z "$${remote:-}" ]] ; then printf '>>> Must set $$remote env var\n' && exit 1 ; fi
 	@rsync -azv --update --exclude=data/ ./ $(remote):minecraft-server --dry-run ; \
 	read -p 'WARNING: the above files will be copied TO the remote. Are you sure you want to do this? ' confirmation ; \
 	if [[ "$${confirmation}" =~ y|Y ]] ; then \
@@ -57,7 +57,7 @@ copy-code-to-remote:
 	fi
 
 start-on-remote:
-	@if [[ -z "$${remote:-}" ]] ; then printf 'Must set $$remote env var\n' && exit 1 ; fi
+	@if [[ -z "$${remote:-}" ]] ; then printf '>>> Must set $$remote env var\n' && exit 1 ; fi
 	@ssh $(remote) -- make -C minecraft-server docker
 
 stop:

@@ -3,17 +3,17 @@ set -euo pipefail
 
 edition="${1:-}"
 if [[ -z "${edition}" ]] ; then
-  printf 'ERROR: Minecraft edition (bedrock|java) not provided as script arg.\n'
+  printf '>>> ERROR: Minecraft edition (bedrock|java) not provided as script arg.\n'
   exit 1
 fi
 if [[ ! "${edition}" =~ bedrock|java ]]; then
-  printf 'ERROR: Invalid Minecraft edition, must be one of "bedrock" or "java"\n' > /dev/stderr
+  printf '>>> ERROR: Invalid Minecraft edition, must be one of "bedrock" or "java"\n' > /dev/stderr
   exit 1
 fi
 
 if [[ -z "${world_data_dir:-'data/default'}" ]] ; then
   # shellcheck disable=SC2016
-  printf 'NOTE: ${world_data_dir} is unset, so will use default of ./data/default\n'
+  printf '>>> NOTE: ${world_data_dir} is unset, so will use default of ./data/default\n'
 fi
 runtime_root="${HOME}/${world_data_dir}"
 mkdir -p "${runtime_root}"
@@ -34,7 +34,7 @@ elif [[ "${edition}" == 'java' ]] ; then
   exec_start="java -Xms${memory}M -Xmx${memory}M -jar ${mc_root}/java/java-server.jar --nogui"
   echo "${exec_start}" > "${exec_start_file}"
 else
-  printf 'ERROR: Invalid Minecraft edition provided -- must be one of (bedrock|java), but you provided "%s".\n' "${edition}"
+  printf '>>> ERROR: Invalid Minecraft edition provided -- must be one of (bedrock|java), but you provided "%s".\n' "${edition}"
   exit 1
 fi
 
