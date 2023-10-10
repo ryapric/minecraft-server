@@ -46,13 +46,15 @@ local:
 	fi ; \
 	./scripts/init.sh bedrock "$${version}" local
 
-copy-to-remote:
+# As indicated by the name, this does NOT copy world data -- that's risky
+# business that I don't want to deal with accidentally overwriting
+copy-code-to-remote:
 	@if [[ -z "$${remote:-}" ]] ; then printf 'Must set $$remote env var\n' && exit 1 ; fi
-	@rsync --update -azv ./ $(remote):minecraft-server
-
-copy-from-remote:
-	@if [[ -z "$${remote:-}" ]] ; then printf 'Must set $$remote env var\n' && exit 1 ; fi
-	@rsync --update -azv $(remote):minecraft-server/ .
+	@rsync -azv --update --exclude=data/ ./ $(remote):minecraft-server --dry-run ; \
+	read -p 'WARNING: the above files will be copied TO the remote. Are you sure you want to do this? ' confirmation ; \
+	if [[ "$${confirmation}" =~ y|Y ]] ; then \
+		rsync -azv --update --exclude=data/ ./ $(remote):minecraft-server ; \
+	fi
 
 start-on-remote:
 	@if [[ -z "$${remote:-}" ]] ; then printf 'Must set $$remote env var\n' && exit 1 ; fi
