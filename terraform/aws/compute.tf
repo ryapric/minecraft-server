@@ -12,7 +12,7 @@ resource "aws_spot_instance_request" "main" {
   # user_data              = file("../../scripts/init.sh")
   vpc_security_group_ids = [aws_security_group.main.id]
 
-  # To prevent unexpected shutdown of t3-family Spot instances 
+  # To prevent unexpected shutdown of t3-family Spot instances
   credit_specification {
     cpu_credits = "standard"
   }
@@ -42,7 +42,7 @@ resource "aws_spot_instance_request" "main" {
   }
 
   provisioner "file" {
-    source      = "../../bedrock-server-cfg" # a directory
+    source      = "../../server-cfg" # a directory
     destination = "/tmp"
   }
 

@@ -1,0 +1,5 @@
+# This will let us essentially auto-agree to the EULA. Note, however, that by using it in this way, YOU ARE AGREEING TO THE EULA
+
+#By changing the setting below to TRUE you are indicating your agreement to our EULA (https://aka.ms/MinecraftEULA).
+#Thu Nov 03 20:27:46 UTC 2022
+eula=true
