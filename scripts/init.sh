@@ -202,8 +202,8 @@ chown -R "${mcuser}:${mcuser}" /home/"${mcuser}"
 ###
 
 printf 'Setting memory limits in case Java edition is running...\n'
-# 75% of max, transformed because mem is listed as kB in meminfo
-memory_limit=$(awk '/MemTotal/ { printf("%.0f", $2 * 0.75 / 1000) }' /proc/meminfo)
+# TODO: make overridable later, but use half of host memory
+memory_limit=$(awk '/MemTotal/ { printf("%.0f", $2 * 0.5 / 1000) }' /proc/meminfo)
 export memory_limit
 
 ###
