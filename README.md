@@ -8,15 +8,14 @@ UNIX-alike system, like macOS or GNU/Linux operating systems. You specific
 results may vary if using Windows and *not* using the Windows Subsystem for
 Linux (WSL).
 
+***NOTE: Java server support is experimental***.
+
 ***[ IN PROGRESS FROM HERE ]***
 
 ## How to use
 
 Deployments are expected to be managed through the `Makefile` -- not the least
-because the server versions are specified at the top of that file.
-
-Some of the following targets allow/expect an `<edition>` argument, where
-`<edition>` is one of "`bedrock`" or "`java`"
+because the default server versions are specified at the top of that file.
 
 ### Deployment targets available
 
@@ -37,9 +36,9 @@ edition=java` etc.
 | Variable name     | Default          | Definition
 | :---------------- | :--------------- | :---------
 | `edition`         | `bedrock`        | Which edition of the server to run, i.e. `bedrock` or `java`.
-| `world_data_dir`  | `./data/default` | Which local directory to use for world data. This allows to localy store different world data but have it mounted to a single place in a running container.
+| `world_data_dir`  | `./data/default` | Which local directory to use for world data. This allows for localy storing different world data but having the desired one mounted to a single place in a running container.
 | `bedrock_version` | See `Makefile`   | Desired version of the Bedrock server. Specified as `MAJOR.MINOR.PATCH`.
-| `java_version`    | See `Makefile`   | Desired version of the Java server. Specified as `MAJOR.MINOR`, without a `PATCH`.
+| `java_version`    | See `Makefile`   | Desired version of the Java server. Specified as `MAJOR.MINOR`, *without* a `PATCH`.
 
 If something happens where you need to manually stop the server(s) using the
 ***local*** targets (Docker, Vagrant, etc), run:
