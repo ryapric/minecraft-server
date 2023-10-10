@@ -31,8 +31,6 @@ if [[ "${edition}" == 'bedrock' ]] ; then
 elif [[ "${edition}" == 'java' ]] ; then
   # TODO: make overridable later, but use half of host memory
   memory=$(awk '/MemTotal/ { printf("%.0f", $2 * 0.5 / 1000) }' /proc/meminfo) # listed as kB in that file
-  # Auto-accept EULA
-  echo 'eula=true' > "${runtime_root}"/eula.txt
   exec_start="java -Xms${memory}M -Xmx${memory}M -jar ${mc_root}/java/java-server.jar --nogui"
   echo "${exec_start}" > "${exec_start_file}"
 else
