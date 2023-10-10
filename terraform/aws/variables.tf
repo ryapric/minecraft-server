@@ -10,7 +10,7 @@ variable "edition" {
 
   validation {
     condition     = can(regex("^(bedrock|java)$", var.edition))
-    error_message = "Edtion must be on eof 'bedrock' or 'java'"
+    error_message = "Edtion must be one of 'bedrock' or 'java'"
   }
 }
 
