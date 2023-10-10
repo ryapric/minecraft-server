@@ -36,3 +36,4 @@ services:
     # - '19132:19132/udp'
     stdin_open: true
     tty: true
+    restart: always
