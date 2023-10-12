@@ -127,6 +127,7 @@ fi
 ###
 
 # TODO: fork this in a case block to associated scripts
+### START AWS
 if [[ "${platform}" == 'aws' ]]; then
 
 command -v aws > /dev/null || {
@@ -174,7 +175,8 @@ Persistent=true
 WantedBy=timers.target
 EOF
 
-# Idempotent creation of worlds folder, so first backup doesn't show a failure in the logs
+# Idempotent creation of worlds folder, so first backup doesn't show a failure
+# in the logs
 mkdir -p "${mc_root}/${edition}"/worlds
 
 systemctl enable minecraft-bedrock-server-backup.service # enabled for shutdown-time backup to work
@@ -186,8 +188,21 @@ systemctl enable minecraft-bedrock-server-backup.timer
 printf '>>> Checking if remote world data exists and needs to be restored...\n'
 /usr/local/bin/minecraft-backups-s3 restore
 
-# END platform fork
 fi
+### END AWS
+
+### START DOCKER
+if [[ "${platform}" == 'docker' ]]; then
+
+# Duplicate mc_root install to another home folder, since we don't care about
+# the specific version in the dirname if it's containerized (and thus we don't
+# need to track it externally either). Among other things, this lets us mount
+# world data to a consistent place
+cp -r "${mc_root}" "${HOME}"/minecraft-docker
+
+fi
+
+### END DOCKER
 
 ###
 

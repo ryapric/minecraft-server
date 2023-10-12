@@ -19,11 +19,10 @@ services:
       java_version: "${java_version}"
       hostuid: "${hostuid}"
       edition: "${edition}"
-      world_data_dir: "${world_data_dir}"
     image: 'ryapric/minecraft-server:latest'
     command: "${edition}" # provided by Makefile
     volumes:
-    - './${world_data_dir}:/home/minecraft/${world_data_dir}'
+    - './data:/home/minecraft/minecraft-docker/worlds'
     # `host` is set here in case this image is building/running in e.g. a
     # homelab running nonstandard DNS (e.g. Pi-Hole), and the container needs to
     # resolve to something reachable. If something about this breaks, take this
