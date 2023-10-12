@@ -29,14 +29,12 @@ as how to use them.
 | AWS      | See the `terraform/aws` subdirectory
 
 Most targets support the Makefile variables `bedrock_version`, `java_version`,
-`edition`, and `world_data_dir`. The Makefile sets defaults if not provided, but
-they can be overridden by setting them at call-time via e.g. `make docker
-edition=java` etc.
+and `edition`. The Makefile sets defaults if not provided, but they can be
+overridden by setting them at call-time via e.g. `make docker edition=java` etc.
 
 | Variable name     | Default          | Definition
 | :---------------- | :--------------- | :---------
-| `edition`         | `bedrock`        | Which edition of the server to run, i.e. `bedrock` or `java`.
-| `world_data_dir`  | `./data/default` | Which local directory to use for world data. This allows for localy storing different world data but having the desired one mounted to a single place in a running container.
+| `edition`         | `bedrock`        | Which edition of the server to run, i.e. `bedrock` or `java`.storing different world data but having the desired one mounted to a single place in a running container.
 | `bedrock_version` | See `Makefile`   | Desired version of the Bedrock server. Specified as `MAJOR.MINOR.PATCH`.
 | `java_version`    | See `Makefile`   | Desired version of the Java server. Specified as `MAJOR.MINOR`, *without* a `PATCH`.
 

@@ -8,21 +8,17 @@ java_version ?= 1.20
 edition ?= bedrock
 hostuid := $(shell id -u)
 
-world_data_dir ?= ./data/default
-
 export bedrock_version
 export java_version
 export edition
 export hostuid
-export world_data_dir
 
 docker:
-	@mkdir -p $(world_data_dir)
+	@mkdir -p data/
 	@export bedrock_version=$(bedrock_version); \
 	export java_version=$(java_version); \
 	export edition=$(edition); \
 	export hostuid=$(hostuid); \
-	export world_data_dir=$(world_data_dir); \
 	BUILDKIT_PROGRESS=plain \
 	docker compose up -d --build
 

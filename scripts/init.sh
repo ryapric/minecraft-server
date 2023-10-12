@@ -21,7 +21,7 @@ fi
 if [[ -z "${platform}" ]]; then
   printf '>>> WARNING: platform not set as third arg to init script, so some features (like backups) will not be enabled\n' > /dev/stderr
 else
-  printf "Platform '%s' provided to init script; will try to set up associated features if applicable\n" "${platform}"
+  printf ">>> Platform '%s' provided to init script; will try to set up associated features if applicable\n" "${platform}"
 fi
 
 # Tried to get this to work in a case-block, but expression needs to be evaluated first, so
@@ -101,7 +101,13 @@ printf '>>> Will use server version %s, and download from %s\n' "${version}" "${
 
 version_short=$(sed -E 's/^([0-9]+\.[0-9]+)\..*$/\1/' <<< "${version}")
 export version_short
-mc_root=$(sudo -u "${mcuser}" sh -c 'echo ${HOME}')/minecraft-"${version_short}"
+
+mc_root=''
+if [[ ! "${platform}" == 'docker' ]]; then
+  mc_root=$(sudo -u "${mcuser}" sh -c 'echo ${HOME}')/minecraft-"${version_short}"
+else
+  mc_root="/home/${mcuser}/minecraft-docker"
+fi
 printf '>>> Setting server(s) root directory as %s\n' "${mc_root}"
 export mc_root
 mkdir -p "${mc_root}/${edition}"
@@ -191,19 +197,6 @@ printf '>>> Checking if remote world data exists and needs to be restored...\n'
 fi
 ### END AWS
 
-### START DOCKER
-if [[ "${platform}" == 'docker' ]]; then
-
-# Duplicate mc_root install to another home folder, since we don't care about
-# the specific version in the dirname if it's containerized (and thus we don't
-# need to track it externally either). Among other things, this lets us mount
-# world data to a consistent place
-cp -r "${mc_root}" "${HOME}"/minecraft-docker
-
-fi
-
-### END DOCKER
-
 ###
 
 printf '>>> Replacing settings files with your own...\n'
@@ -211,7 +204,7 @@ cp -r "${cfg_root}/${edition}"/* "${mc_root}"/"${edition}"
 
 ###
 
-printf '>>> Setting permissions on server directory...\n'
+printf '>>> Setting permissions on user home directory...\n'
 chown -R "${mcuser}:${mcuser}" /home/"${mcuser}"
 
 ###
