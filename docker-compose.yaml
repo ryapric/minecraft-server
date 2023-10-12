@@ -37,4 +37,4 @@ services:
     stdin_open: true
     tty: true
     restart: always
-    cpus: "${cpus:-2.0}"
+    cpus: "${cpus:-3.0}"
