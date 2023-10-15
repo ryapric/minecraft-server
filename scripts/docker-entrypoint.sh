@@ -12,6 +12,7 @@ if [[ ! "${edition}" =~ bedrock|java ]]; then
 fi
 
 mc_root="${HOME}/minecraft-docker/${edition}"
+cd "${mc_root}" || exit 1
 
 exec_start_file="${HOME}/start.sh"
 
@@ -28,5 +29,20 @@ else
   exit 1
 fi
 
-cd "${mc_root}" || exit 1
+# TODO: this is reall rudimentary, but it works, so.
+backup_dir="${mc_root}/worlds/backups"
+mkdir -p "${backup_dir}"
+make-backups() {
+  while true ; do
+    backup_file="${backup_dir}/backup-$(date '+%Y-%d-%mT%H-%M-%S').tar.gz"
+    printf '>>> Running backup job for file %s...\n' "${backup_file}"
+    tar \
+      -czf "${backup_file}" \
+      --exclude="worlds/backups" \
+      ./worlds
+    sleep 1800
+  done
+}
+make-backups &
+
 bash "${exec_start_file}"
