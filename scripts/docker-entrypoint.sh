@@ -34,7 +34,7 @@ backup_dir="${mc_root}/worlds/backups"
 mkdir -p "${backup_dir}"
 make-backups() {
   while true ; do
-    backup_file="${backup_dir}/backup-$(date '+%Y-%d-%mT%H-%M-%S').tar.gz"
+    backup_file="${backup_dir}/backup-$(date '+%Y-%m-%dT%H-%M-%S').tar.gz"
     printf '>>> Running backup job for file %s...\n' "${backup_file}"
     tar \
       -czf "${backup_file}" \
