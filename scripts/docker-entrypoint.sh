@@ -40,6 +40,12 @@ make-backups() {
       -czf "${backup_file}" \
       --exclude="worlds/backups" \
       ./worlds
+    # if [[ "$(find ./worlds/backups -type f -mtime +5 | wc -l)" -gt 0 ]] ; then
+    #   printf '>>> Deleting the following file(s) because they are more than 5 days old...\n'
+    #   find ./worlds/backups -type f -mtime +5
+    #   find ./worlds/backups -type f -mtime +5 -exec rm {} \;
+    # fi
+    printf '>>> Done with backup job.\n'
     sleep 1800
   done
 }
