@@ -43,6 +43,18 @@ If something happens where you need to manually stop the server(s) using the
 
     make stop
 
+## How to use Mods & Addons
+
+Currently, the onus of getting mod/addon files onto your deployment target has
+some manual requirements in the form of downloading the files themselves using a
+browser.
+
+Download a desired mod, and place it in a top-level directory in this repo
+called `mods/`. Make sure the file(s) ends in a supported extension, like
+`.mcpack`. The `scripts/init-mods-*` script(s) in this repo will take care of
+extracting the files, putting them where they belong, and collecting the
+necessary metadata for your server to know about them.
+
 ## How to update
 
 1. Change any relevant values in your config file

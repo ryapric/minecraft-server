@@ -19,10 +19,10 @@ printf '>>> Processing any discovered mods/addons...\n'
 for mod_dir in /tmp/mods/* ; do
   printf '>>> Setting up mod from directory %s...\n' "${mod_dir}"
   cd "${mod_dir}" || exit 1
-  mod_name="$(basename ${mod_dir})"
-  unzip ./*.mcpack
+  mod_name="$(basename "${mod_dir}")"
+  unzip ./*.mcpack && rm -f ./*.mcpack
   mkdir -p "${mc_root}/resource_packs/${mod_name}/"
-  [[ -d ./textures ]] && cp -r ./textures/* "${mc_root}/resource_packs/${mod_name}/"
+  cp -r ./* "${mc_root}/resource_packs/${mod_name}/"
   jq '{"pack_id": .header.uuid, "version": .header.version}' ./manifest.json > "${mod_dir}/${mod_name}_mergeable_metadata.json"
 done
 
