@@ -63,7 +63,9 @@ apt-get update
 apt-get install -y \
   curl \
   htop \
+  jq \
   sudo \
+  tree \
   unzip \
   zip
 if [[ "${edition}" == 'java' ]] ; then

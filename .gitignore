@@ -1,5 +1,5 @@
 .vagrant
 
-# Container mount directory
+# Container mount directories
 data/*
-!data/.do-not-delete
+mods/*
