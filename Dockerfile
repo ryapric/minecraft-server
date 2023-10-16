@@ -20,14 +20,12 @@ RUN /tmp/scripts/init.sh bedrock "${bedrock_version}" docker
 RUN /tmp/scripts/init.sh java "${java_version}" docker
 
 COPY ./mods /tmp/mods
-COPY ./scripts/init-mods.sh /tmp/init-mods.sh
+COPY ./scripts/init-mods-docker.sh /tmp/init-mods-docker.sh
 RUN chown -R minecraft:minecraft /tmp/mods
 
 USER minecraft
 ENV SHELL="/usr/bin/env bash"
 WORKDIR /home/minecraft
-
-RUN bash /tmp/init-mods.sh bedrock
 
 COPY ./scripts/docker-entrypoint.sh /home/minecraft/docker-entrypoint.sh
 

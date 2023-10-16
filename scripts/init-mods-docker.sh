@@ -17,6 +17,7 @@ printf '>>> Processing any discovered mods/addons...\n'
 
 # Iterate through Bedrock mods, setting them up and extracting metadata for enablement
 for mod_dir in /tmp/mods/* ; do
+  printf '>>> Setting up mod from directory %s...\n' "${mod_dir}"
   cd "${mod_dir}" || exit 1
   mod_name="$(basename ${mod_dir})"
   unzip ./*.mcpack
@@ -26,4 +27,8 @@ for mod_dir in /tmp/mods/* ; do
 done
 
 # Merge all collected metadata for Bedrock mods
-find . -type f -name "*_metadata.json" -exec jq -s '[.][0]' {} + > "${mc_root}/world_resource_packs.json"
+find . -type f -name "*_mergeable_metadata.json" -exec jq -s '[.][0]' {} + > /tmp/world_resource_packs.json
+for world in "${mc_root}"/worlds/* ; do
+  printf '>>> Adding metadata JSON files for world directory '%s'...\n' "${world}"
+  cp /tmp/world_resource_packs.json "${world}"/
+done

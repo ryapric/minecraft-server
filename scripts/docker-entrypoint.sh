@@ -29,6 +29,9 @@ else
   exit 1
 fi
 
+# Set up mods
+bash /tmp/init-mods-docker.sh "${edition}"
+
 # TODO: this is reall rudimentary, but it works, so.
 backup_dir="${mc_root}/worlds/backups"
 mkdir -p "${backup_dir}"
