@@ -43,11 +43,12 @@ make-backups() {
       -czf "${backup_file}" \
       --exclude="worlds/backups" \
       ./worlds
-    # if [[ "$(find ./worlds/backups -type f -mtime +3 | wc -l)" -gt 0 ]] ; then
-    #   printf '>>> Deleting the following file(s) because they are more than 3 days old...\n'
-    #   find ./worlds/backups -type f -mtime +3
-    #   find ./worlds/backups -type f -mtime +3 -exec rm {} \;
-    # fi
+    find ./worlds/backups -type f -mtime +3 > /tmp/backups-to-delete
+    if [[ "$(cat /tmp/backups-to-delete | wc -l)" -gt 0 ]] ; then
+      printf '>>> Deleting the following file(s) because they are more than 3 days old...\n'
+      cat /tmp/backups-to-delete
+      cat /tmp/backups-to-delete | xargs -I{} rm {}
+    fi
     printf '>>> Done with backup job.\n'
     sleep 1800
   done
