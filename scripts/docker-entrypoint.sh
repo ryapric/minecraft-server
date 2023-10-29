@@ -43,7 +43,8 @@ make-backups() {
     tar \
       -czf "${backup_file}" \
       --exclude="${backup_dir}" \
-      ./worlds
+      ./worlds \
+    || printf '>>> WARNING: Backup failed for some reason.\n'
     find ./worlds/backups -type f -mtime +3 > /tmp/backups-to-delete
     if [[ "$(cat /tmp/backups-to-delete | wc -l)" -gt 0 ]] ; then
       printf '>>> Deleting the following file(s) because they are more than 3 days old...\n'
