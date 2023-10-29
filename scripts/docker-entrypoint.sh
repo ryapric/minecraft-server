@@ -36,6 +36,7 @@ bash /tmp/init-mods-docker.sh "${edition}"
 backup_dir="./worlds/backups"
 mkdir -p "${backup_dir}"
 make-backups() {
+  sleep 5 # wait so that the server finishes touching its own files
   while true ; do
     backup_file="${backup_dir}/backup-$(date '+%Y-%m-%dT%H-%M-%S').tar.gz"
     printf '>>> Running backup job for file %s...\n' "${backup_file}"
