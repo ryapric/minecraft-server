@@ -93,8 +93,8 @@ else
     curl -fsSL "https://minecraft.wiki/w/Bedrock_Dedicated_Server" \
     | sed 's/>/>\n/g' \
     | grep "${version}" \
-    | grep -E -o '<a .*https://.*bin-linux(-preview?)/.*\.zip">' \
-    | grep -E -o 'https://.*bin-linux(-preview?)/.*\.zip' \
+    | grep -E -o '<a .*https://.*bin-linux(-preview)?/.*\.zip">' \
+    | grep -E -o 'https://.*bin-linux(-preview)?/.*\.zip' \
     | tail -n1
   )
 fi

@@ -2,7 +2,7 @@ SHELL := /usr/bin/env bash -euo pipefail
 
 # These need to be separate because the lookup behavior for each of them is
 # different -- Bedrock needs Major-Minor-Patch, Java just needs Major-Minor
-bedrock_version ?= 1.20.30
+bedrock_version ?= 1.20.40
 java_version ?= 1.20
 
 edition ?= bedrock
