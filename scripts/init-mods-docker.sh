@@ -28,7 +28,7 @@ if [[ ! -d "${mc_root}"/worlds ]] || [[ "$(find "${mc_root}"/worlds -type d -nam
 fi
 
 # Iterate through Bedrock mods, setting them up and extracting metadata for enablement
-for mod_file in /tmp/mods/* ; do
+for mod_file in /tmp/mods/*.mc* ; do
   printf '>>> Setting up mod from file %s...\n' "${mod_file}"
   mod_name="$(basename "${mod_file%.*}")"
   root_mod_dir="/tmp/mods/${mod_name}"
