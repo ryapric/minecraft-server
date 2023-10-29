@@ -20,6 +20,13 @@ mc_root="${HOME}/minecraft-docker/${edition}"
 
 printf '>>> Processing any discovered mods/addons...\n'
 
+# We can't fully process mods until world data & directories exist, so this is a
+# context-free check for that condition
+if [[ ! -d "${mc_root}"/worlds ]] || [[ "$(find "${mc_root}"/worlds -type d -name 'db' | wc -l)" -eq 0 ]]; then
+  printf '>>> WARNING: Cannot process mods until world data exists. Start world for the first time, then fully restart to process mods\n' >&2
+  exit 0
+fi
+
 # Iterate through Bedrock mods, setting them up and extracting metadata for enablement
 for mod_file in /tmp/mods/* ; do
   printf '>>> Setting up mod from file %s...\n' "${mod_file}"

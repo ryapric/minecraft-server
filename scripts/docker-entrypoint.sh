@@ -33,7 +33,7 @@ fi
 bash /tmp/init-mods-docker.sh "${edition}"
 
 # TODO: this is reall rudimentary, but it works, so.
-backup_dir="${mc_root}/worlds/backups"
+backup_dir="./worlds/backups"
 mkdir -p "${backup_dir}"
 make-backups() {
   while true ; do
@@ -41,7 +41,7 @@ make-backups() {
     printf '>>> Running backup job for file %s...\n' "${backup_file}"
     tar \
       -czf "${backup_file}" \
-      --exclude="worlds/backups" \
+      --exclude="${backup_dir}" \
       ./worlds
     find ./worlds/backups -type f -mtime +3 > /tmp/backups-to-delete
     if [[ "$(cat /tmp/backups-to-delete | wc -l)" -gt 0 ]] ; then
