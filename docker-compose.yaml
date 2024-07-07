@@ -1,4 +1,4 @@
-version: '3.9' # >=3.8 required to set container resource limits
+# version: '3.9' # >=3.8 required to set container resource limits
 
 services:
 

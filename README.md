@@ -34,7 +34,7 @@ overridden by setting them at call-time via e.g. `make docker edition=java` etc.
 
 | Variable name     | Default          | Definition
 | :---------------- | :--------------- | :---------
-| `edition`         | `bedrock`        | Which edition of the server to run, i.e. `bedrock` or `java`.storing different world data but having the desired one mounted to a single place in a running container.
+| `edition`         | `bedrock`        | Which edition of the server to run, i.e. `bedrock` or `java`.
 | `bedrock_version` | See `Makefile`   | Desired version of the Bedrock server. Specified as `MAJOR.MINOR.PATCH`.
 | `java_version`    | See `Makefile`   | Desired version of the Java server. Specified as `MAJOR.MINOR`, *without* a `PATCH`.
 

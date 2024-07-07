@@ -14,6 +14,8 @@ fi
 mc_root="${HOME}/minecraft-docker/${edition}"
 cd "${mc_root}" || exit 1
 
+level_name="$(grep 'level-name' "${mc_root}"/server.properties | awk -F= '{ print $2 }')"
+
 exec_start_file="${HOME}/start.sh"
 
 if [[ "${edition}" == 'bedrock' ]] ; then
@@ -38,19 +40,20 @@ mkdir -p "${backup_dir}"
 make-backups() {
   sleep 5 # wait so that the server finishes touching its own files
   while true ; do
-    backup_file="${backup_dir}/backup-$(date '+%Y-%m-%dT%H-%M-%S').tar.gz"
+    backup_file="${backup_dir}/${level_name}-backup-$(date '+%Y-%m-%dT%H-%M-%S').tar.gz"
     printf '>>> Running backup job for file %s...\n' "${backup_file}"
     tar \
       -czf "${backup_file}" \
       --exclude="${backup_dir}" \
       ./worlds \
     || printf '>>> WARNING: Backup failed for some reason.\n'
-    find ./worlds/backups -type f -mtime +3 > /tmp/backups-to-delete
-    if [[ "$(cat /tmp/backups-to-delete | wc -l)" -gt 0 ]] ; then
-      printf '>>> Deleting the following file(s) because they are more than 3 days old...\n'
-      cat /tmp/backups-to-delete
-      cat /tmp/backups-to-delete | xargs -I{} rm {}
-    fi
+    # TODO: make this more robust so multiple worlds' worth of backups are considered separately
+    # find ./worlds/backups -type f -mtime +3 > /tmp/backups-to-delete
+    # if [[ "$(cat /tmp/backups-to-delete | wc -l)" -gt 0 ]] ; then
+    #   printf '>>> Deleting the following file(s) because they are more than 3 days old...\n'
+    #   cat /tmp/backups-to-delete
+    #   cat /tmp/backups-to-delete | xargs -I{} rm {}
+    # fi
     printf '>>> Done with backup job.\n'
     sleep 1800
   done

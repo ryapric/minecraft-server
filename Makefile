@@ -2,8 +2,12 @@ SHELL := /usr/bin/env bash -euo pipefail
 
 # These need to be separate because the lookup behavior for each of them is
 # different -- Bedrock needs Major-Minor-Patch, Java just needs Major-Minor
-bedrock_version ?= 1.20.40
-java_version ?= 1.20
+#
+# You can look up available versions at:
+# Bedrock: https://minecraft.wiki/w/Bedrock_Dedicated_Server#Release_versions
+# Java: https://minecraft.wiki/w/Java_Edition_{version} (there's no index page at the time of this writing)
+bedrock_version ?= 1.21.1
+java_version ?= 1.21
 
 edition ?= bedrock
 hostuid := $(shell id -u)

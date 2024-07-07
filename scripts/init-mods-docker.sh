@@ -32,7 +32,7 @@ for mod_file in /tmp/mods/*.mc* ; do
   printf '>>> Setting up mod from file %s...\n' "${mod_file}"
   mod_name="$(basename "${mod_file%.*}")"
   root_mod_dir="/tmp/mods/${mod_name}"
-  unzip -q -d "${root_mod_dir}/" "${mod_file}"
+  unzip -q -u -d "${root_mod_dir}/" "${mod_file}"
   # Some mods are zipped with another directory above the content, so find it here
   real_root_mod_dir="$(dirname "$(find "${root_mod_dir}" -type f -name 'manifest.json')")"
   mkdir -p "${mc_root}/resource_packs/${mod_name}/"

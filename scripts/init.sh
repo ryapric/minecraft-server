@@ -86,7 +86,7 @@ if [[ "${edition}" == 'java' ]]; then
     | sed 's/>/>\n/g' \
     | grep -E -o '<a .*https://.*?server\.jar">' \
     | grep -E -o 'https://.*?server\.jar' \
-    | tail -n1
+    | head -n1
   )
 else
   download_url=$(
@@ -95,7 +95,7 @@ else
     | grep "${version}" \
     | grep -E -o '<a .*https://.*bin-linux(-preview)?/.*\.zip">' \
     | grep -E -o 'https://.*bin-linux(-preview)?/.*\.zip' \
-    | tail -n1
+    | head -n1
   )
 fi
 
@@ -204,6 +204,8 @@ fi
 printf '>>> Replacing settings files with your own...\n'
 cp -r "${cfg_root}/${edition}"/* "${mc_root}"/"${edition}"
 
+level_name="$(grep 'level-name' "${mc_root}/${edition}"/server.properties | awk -F= '{ print $2 }')"
+
 ###
 
 printf '>>> Setting permissions on user home directory...\n'
@@ -262,4 +264,4 @@ fi
 
 ###
 
-printf '>>> All done! Your Minecraft World "%s" should be running!\n' "$(grep 'level-name' "${mc_root}/${edition}"/server.properties | awk -F= '{ print $2 }')"
+printf '>>> All done! Your Minecraft World "%s" should be running!\n' "${level_name}"
