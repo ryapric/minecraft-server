@@ -3,6 +3,7 @@
 services:
 
   minecraft:
+    # entrypoint: bash
     container_name: minecraft
     # image expected to be built using `make build-docker` instead of mucking
     # around with a build key & args here
@@ -25,17 +26,17 @@ services:
     image: 'ryapric/minecraft-server-${level_name}:latest'
     command: "${edition}" # provided by Makefile
     volumes:
-    - "./data/${level_name}:/home/minecraft/minecraft-docker/${edition}/worlds"
+      - "./data:/home/minecraft/minecraft-docker/${edition}/worlds"
     # `host` is set here in case this image is building/running in e.g. a
     # homelab running nonstandard DNS (e.g. Pi-Hole), and the container needs to
     # resolve to something reachable. If something about this breaks, take this
     # line out and replace it with the ports section below.
     network_mode: 'host'
     # ports:
-    # - '25565:25565/tcp'
-    # - '25565:25565/udp'
-    # - '19132:19132/tcp'
-    # - '19132:19132/udp'
+    #   - '25565:25565/tcp'
+    #   - '25565:25565/udp'
+    #   - '19132:19132/tcp'
+    #   - '19132:19132/udp'
     stdin_open: true
     tty: true
     restart: always

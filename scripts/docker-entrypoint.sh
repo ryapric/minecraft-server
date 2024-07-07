@@ -36,7 +36,8 @@ bash /tmp/init-mods-docker.sh "${edition}"
 
 # TODO: this is reall rudimentary, but it works, so.
 backup_dir="./worlds/backups"
-mkdir -p "${backup_dir}"
+# TODO: for some reason this is erroring out on permissions after a change
+# mkdir -p "${backup_dir}"
 make-backups() {
   sleep 5 # wait so that the server finishes touching its own files
   while true ; do

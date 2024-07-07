@@ -10,7 +10,7 @@ bedrock_version ?= 1.21.1
 java_version ?= 1.21
 
 edition ?= bedrock
-level_name ?= not-provided-by-user
+level_name ?=
 hostuid := $(shell id -u)
 
 export bedrock_version
@@ -19,7 +19,15 @@ export edition
 export level_name
 export hostuid
 
-docker:
+check-level-name:
+	@if [[ -z "$(level_name)" ]] ; then \
+		printf 'ERROR: level_name Make var required -- this should match your world config subdirectory name under "server-cfg/$(edition)\n' && exit 1 ; \
+	fi
+	@if [[ ! -d "./server-cfg/$(edition)/$(level_name)" ]] ; then \
+		printf 'ERROR: provided level_name "%s" is not a subdirectory under server-cfg/$(edition)\n' "$(level_name)" && exit 1 ; \
+	fi
+
+docker: check-level-name
 	@mkdir -p data/
 	@export bedrock_version=$(bedrock_version); \
 	export java_version=$(java_version); \

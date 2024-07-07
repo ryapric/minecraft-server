@@ -43,6 +43,7 @@ done
 # Merge all collected metadata for Bedrock mods
 find /tmp/mods -type f -name "*_mergeable_metadata.json" -exec jq -s '[.][0]' {} + > /tmp/world_resource_packs.json
 for world in "${mc_root}"/worlds/* ; do
+  if [[ "${world}" =~ '/backups' ]] ; then continue ; fi
   printf '>>> Adding metadata JSON files for world directory '%s'...\n' "${world}"
   cp /tmp/world_resource_packs.json "${world}"/
 done
