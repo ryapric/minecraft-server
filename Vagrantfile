@@ -1,6 +1,7 @@
 # You can set these yourself, but they're expected to be passed in the Makefile
 bedrock_version = ENV["bedrock_version"]
 java_version    = ENV["java_version"]
+level_name      = ENV["level_name"]
 
 if not bedrock_version or not java_version
   puts "WARNING: You typically must provide version strings for the Minecraft server editions -- did you forget to call this from the Makefile?"
@@ -43,7 +44,7 @@ Vagrant.configure("2") do |config|
 
     mc.vm.provision "shell",
       inline: <<-SCRIPT
-        bash /tmp/scripts/init.sh bedrock #{bedrock_version} vagrant
+        bash /tmp/scripts/init.sh bedrock #{bedrock_version} vagrant #{level_name}
       SCRIPT
   end
 
@@ -62,7 +63,7 @@ Vagrant.configure("2") do |config|
 
     mc.vm.provision "shell",
       inline: <<-SCRIPT
-        bash /tmp/scripts/init.sh java #{java_version} vagrant
+        bash /tmp/scripts/init.sh java #{java_version} vagrant #{level_name}
       SCRIPT
   end
 end

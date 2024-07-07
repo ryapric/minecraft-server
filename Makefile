@@ -40,10 +40,12 @@ docker: check-level-name
 docker-logs:
 	docker compose logs
 
-vagrant:
-	bedrock_version=$(bedrock_version) \
-	java_version=$(java_version) \
-	vagrant up $(edition)
+vagrant: check-level-name
+	@export bedrock_version=$(bedrock_version) ; \
+	export java_version=$(java_version) ; \
+	export level_name=$(level_name) ; \
+	vagrant up $(edition) --no-provision ; \
+	vagrant provision
 
 aws:
 	terraform -chdir=./terraform/aws init -backend-config=backend.tfvars
