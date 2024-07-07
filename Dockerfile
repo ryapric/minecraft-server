@@ -2,6 +2,7 @@ FROM debian:12
 
 ARG bedrock_version
 ARG java_version
+ARG level_name
 
 # hostuid is needed to make sure the created image has a user with the same
 # UID/GID as the host, so that mounts will work without permission errors. This
@@ -16,8 +17,8 @@ RUN useradd --create-home --uid "${hostuid}" minecraft
 COPY ./scripts/init.sh /tmp/scripts/init.sh
 COPY ./server-cfg /tmp/server-cfg
 
-RUN /tmp/scripts/init.sh bedrock "${bedrock_version}" docker
-RUN /tmp/scripts/init.sh java "${java_version}" docker
+RUN /tmp/scripts/init.sh bedrock "${bedrock_version}" docker "${level_name}"
+RUN /tmp/scripts/init.sh java "${java_version}" docker "${level_name}"
 
 COPY ./mods /tmp/mods
 COPY ./scripts/init-mods-docker.sh /tmp/init-mods-docker.sh

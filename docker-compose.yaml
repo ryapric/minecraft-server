@@ -14,16 +14,18 @@ services:
         java_version: "${java_version}"
         hostuid: "${hostuid}"
         edition: "${edition}"
+        level_name: "${level_name}"
       network: 'host' # see below for why
     environment:
       bedrock_version: "${bedrock_version}"
       java_version: "${java_version}"
       hostuid: "${hostuid}"
       edition: "${edition}"
-    image: 'ryapric/minecraft-server:latest'
+      level_name: "${level_name}"
+    image: 'ryapric/minecraft-server-${level_name}:latest'
     command: "${edition}" # provided by Makefile
     volumes:
-    - "./data:/home/minecraft/minecraft-docker/${edition}/worlds"
+    - "./data/${level_name}:/home/minecraft/minecraft-docker/${edition}/worlds"
     # `host` is set here in case this image is building/running in e.g. a
     # homelab running nonstandard DNS (e.g. Pi-Hole), and the container needs to
     # resolve to something reachable. If something about this breaks, take this

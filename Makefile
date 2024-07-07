@@ -10,11 +10,13 @@ bedrock_version ?= 1.21.1
 java_version ?= 1.21
 
 edition ?= bedrock
+level_name ?= not-provided-by-user
 hostuid := $(shell id -u)
 
 export bedrock_version
 export java_version
 export edition
+export level_name
 export hostuid
 
 docker:
@@ -22,6 +24,7 @@ docker:
 	@export bedrock_version=$(bedrock_version); \
 	export java_version=$(java_version); \
 	export edition=$(edition); \
+	export level_name=$(level_name); \
 	export hostuid=$(hostuid); \
 	BUILDKIT_PROGRESS=plain \
 	docker compose up -d --build

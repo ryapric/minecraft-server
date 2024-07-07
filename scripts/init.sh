@@ -6,6 +6,7 @@ set -euo pipefail
 export edition="${1:-}"
 export version="${2:-}"
 export platform="${3:-}"
+export level_name="${4:-}"
 
 if [[ -z "${edition}" ]]; then
   printf '>>> ERROR: Minecraft edition (bedrock|java) not set as first arg to init script.\n' > /dev/stderr
@@ -22,6 +23,10 @@ if [[ -z "${platform}" ]]; then
   printf '>>> WARNING: platform not set as third arg to init script, so some features (like backups) will not be enabled\n' > /dev/stderr
 else
   printf ">>> Platform '%s' provided to init script; will try to set up associated features if applicable\n" "${platform}"
+fi
+if [[ -z "${level_name}" ]]; then
+  printf '>>> ERROR: Level name not set as fourth arg arg to init script -- this should match your world config subdirectory name under "server-cfg/<edition>".\n' > /dev/stderr
+  exit 1
 fi
 
 # Tried to get this to work in a case-block, but expression needs to be evaluated first, so
@@ -202,9 +207,7 @@ fi
 ###
 
 printf '>>> Replacing settings files with your own...\n'
-cp -r "${cfg_root}/${edition}"/* "${mc_root}"/"${edition}"
-
-level_name="$(grep 'level-name' "${mc_root}/${edition}"/server.properties | awk -F= '{ print $2 }')"
+cp -r "${cfg_root}/${edition}/${level_name}"/* "${mc_root}"/"${edition}"
 
 ###
 

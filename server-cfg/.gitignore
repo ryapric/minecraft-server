@@ -1,3 +1,4 @@
-allowlist.json
-permissions.json
-server.properties
+*
+!*/
+!/bedrock/example/*
+!/java/example/*
