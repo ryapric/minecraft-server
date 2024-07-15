@@ -6,7 +6,7 @@ SHELL := /usr/bin/env bash -euo pipefail
 # You can look up available versions at:
 # Bedrock: https://minecraft.wiki/w/Bedrock_Dedicated_Server#Release_versions
 # Java: https://minecraft.wiki/w/Java_Edition_{version} (there's no index page at the time of this writing)
-bedrock_version ?= 1.21.1
+bedrock_version ?= 1.21.2
 java_version ?= 1.21
 
 edition ?= bedrock
